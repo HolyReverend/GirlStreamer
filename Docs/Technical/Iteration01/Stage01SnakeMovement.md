@@ -1,6 +1,6 @@
 # Stage 1: Snake Movement — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: planned; implementation has not started.
+Date: 2026-11-12. Status: implemented and technically verified; editor smoke passed; full manual input verification remains open.
 
 **Goal:** Run the existing Godot project and control a visible, fixed-length Snake on a grid with predictable discrete movement and one buffered turn per tick.
 
@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: planned; implementation has not started.
 
 **Specification:** [Iteration 1 roadmap](../Iteration01ImplementationPlan.md), Stage 1 and shared contracts; [Minigames](../../GameDesign/Mechanics/Minigames.md), Snake and input compatibility sections.
 
-This document authorizes no engine changes by itself. When implementation is requested, follow the project workflow and engine implementation rules, inspect the actual project/editor state, and use the project stage-orchestration workflow for the whole stage. Checkboxes below track future work, not completed work.
+This document authorizes no engine changes by itself. When implementation is requested, follow the project workflow and engine implementation rules, inspect the actual project/editor state, and use the project stage-orchestration workflow for the whole stage. Checkboxes track implementation and verification against this plan.
 
 ## 1. Scope and completion target
 
@@ -138,24 +138,24 @@ Mark only recognized movement presses handled, including recognized turns reject
 
 ### A. Establish the movement model
 
-- [ ] Recheck current files and project instructions; confirm the engine version without opening/importing with another version.
-- [ ] Create the focused movement checks listed in Section 6 and run them against the initial model interface; confirm a meaningful failure before implementing the rules.
-- [ ] Implement `SnakeState` and its five methods from Section 3.
-- [ ] Run the checks and resolve failures before wiring rendering or input.
+- [x] Recheck current files and project instructions; confirm the engine version without opening/importing with another version.
+- [x] Create the focused movement checks listed in Section 6 and run them against the initial model interface; confirm a meaningful failure before implementing the rules.
+- [x] Implement `SnakeState` and its five methods from Section 3.
+- [x] Run the checks and resolve failures before wiring rendering or input.
 
 ### B. Build the grid view and simulation controller
 
-- [ ] Create `snake_game.tscn` with its Board child and attach the typed scripts.
-- [ ] Implement rectangle-based drawing and snapshot refresh; keep rendering independent of model mutation.
-- [ ] Implement `start()`, `stop()` and fixed-interval accumulation. Expose grid dimensions and tick interval with the stated defaults/ranges. Before resetting or starting, reject dimensions outside 8–64 and a nonfinite or out-of-range tick interval: report a clear configuration error and leave simulation/input stopped. Do not silently clamp loaded settings or enter the accumulator loop with them.
-- [ ] Add the four Input Map actions and event-based steering. Verify the scene/scripts load before composing the session.
+- [x] Create `snake_game.tscn` with its Board child and attach the typed scripts.
+- [x] Implement rectangle-based drawing and snapshot refresh; keep rendering independent of model mutation.
+- [x] Implement `start()`, `stop()` and fixed-interval accumulation. Expose grid dimensions and tick interval with the stated defaults/ranges. Before resetting or starting, reject dimensions outside 8–64 and a nonfinite or out-of-range tick interval: report a clear configuration error and leave simulation/input stopped. Do not silently clamp loaded settings or enter the accumulator loop with them.
+- [x] Add the four Input Map actions and event-based steering. Verify the scene/scripts load before composing the session.
 
 ### C. Compose the runnable stage
 
-- [ ] Create the minimal HUD scene and layout getter/notification; no future message or score widgets.
-- [ ] Create the session scene, connect layout once and start Snake after the first usable layout. Register it as the project main scene.
+- [x] Create the minimal HUD scene and layout getter/notification; no future message or score widgets.
+- [x] Create the session scene, connect layout once and start Snake after the first usable layout. Register it as the project main scene.
 - [ ] Run the focused editor scenario in Section 6. Fix errors in the owning model, controller or layout rather than adding duplicate state to the session.
-- [ ] Record changed files and actual check results; leave unperformed checks explicitly `NotRun`. Do not mark implementation accepted solely because scripts parse.
+- [x] Record changed files and actual check results; leave unperformed checks explicitly `NotRun`. Do not mark implementation accepted solely because scripts parse.
 
 ## 6. Necessary verification
 
@@ -190,10 +190,44 @@ Godot distinguishes rendering updates from fixed physics callbacks in its [proce
 
 ## 7. Acceptance and handoff
 
-- [ ] Main scene starts successfully in the intended Godot version with no relevant debugger errors.
-- [ ] Grid, fixed-length body and distinct head are visible; steering and turn buffering meet Sections 3–4.
-- [ ] Five model checks pass with the expected completion marker and successful exit.
+- [x] Main scene starts successfully in the intended Godot version with no relevant debugger errors.
+- [x] Grid, fixed-length body and distinct head are visible; steering and turn buffering meet Sections 3–4.
+- [x] Five model checks pass with the expected completion marker and successful exit.
 - [ ] Editor input/layout/frame-rate scenario is completed and its observations recorded.
-- [ ] No mechanics from Stages 2–5 have been implemented as hidden prerequisites.
+- [x] No mechanics from Stages 2–5 have been implemented as hidden prerequisites.
 
 The implementation report must list actual added/modified files, test commands/results and any `NotRun` checks. Carry forward the temporary boundary guard and absent self-collision explicitly so Stage 3 replaces them. Stage 2 should extend the same model with food/growth and the same renderer with food drawing; it should not create a second Snake state or replace the scene architecture.
+
+## 8. Execution record
+
+**Baseline:** `a46deb4`, clean working tree before implementation. Godot `4.7.2.stable.official.ed1daf0bf` (Standard, Compatibility). Scope covers Stage 1 and its verification. The temporary edge guard and absence of self-collision remain Stage 3 replacement points.
+
+### Changed files
+
+| File | Change |
+| --- | --- |
+| [project.godot](../../../GirlStreamer/project.godot) | Main scene, 1024×768 initial window, arrow keys and physical WASD actions. |
+| [prototype_session.tscn](../../../GirlStreamer/prototype/prototype_session.tscn) and [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd) | Session composition, minimum window size, one-time startup after layout. |
+| [snake_game.tscn](../../../GirlStreamer/prototype/snake/snake_game.tscn) and [snake_game.gd](../../../GirlStreamer/prototype/snake/snake_game.gd) | Controller and board composition, validated settings, event-based steering and fixed-interval simulation. |
+| [snake_state.gd](../../../GirlStreamer/prototype/snake/snake_state.gd) | Three-cell model, buffered turns, snapshot copies and temporary edge guard. |
+| [snake_board.gd](../../../GirlStreamer/prototype/snake/snake_board.gd) | Square-cell rendering with a distinct head. |
+| [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn) and [prototype_hud.gd](../../../GirlStreamer/prototype/ui/prototype_hud.gd) | Board region, instructions and deferred layout notification. |
+| [test_snake_movement.gd](../../../GirlStreamer/tests/iteration01/test_snake_movement.gd) | Five deterministic model checks, including copy isolation within the reset check. |
+| `*.gd.uid` beside the six new scripts | Godot-generated script UID metadata. |
+| This plan and the [iteration roadmap](../Iteration01ImplementationPlan.md) | Implementation and verification status. |
+
+### Evidence
+
+All runs used the verified 4.7.2 console executable and `--path GirlStreamer`. Local logs and the temporary graphical probe are in `GirlStreamer/.godot/`, outside tracked source.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Model runner against the initial interface | Fail as expected | `--headless --script res://tests/iteration01/test_snake_movement.gd` returned exit 1 with `STAGE01_MOVEMENT_FAIL _reset_and_step`. |
+| Runner with a deliberately incorrect expectation in a temporary copy | Pass | Exit 1, expected failure marker, no success marker. See `stage01-negative.log`. |
+| Model runner against the implemented model | Pass | Exit 0, `STAGE01_MOVEMENT_PASS checks=5`. See `stage01-movement.log`. |
+| Editor import and main scene startup | Pass | `--headless --import` and `--headless --quit-after 120` exited 0 with no engine or script errors on the final runs. The first import logged sandbox AppData write errors. Redirecting AppData for the verification process resolved them. See `stage01-import-retry.log` and `stage01-smoke.log`. |
+| Graphical runtime at 30 and 60 FPS | Pass | The standalone probe used the configured main scene, injected keyboard events through the viewport, resized to 1160×800 and checked state and layout. It verified reversal rejection, Up/Left buffering, physical D, key echo rejection, the edge guard and turning away. At measured 30.00 and 60.00 FPS, five subsequent moves took 1.000 s at both caps. See `stage01-30.log` and `stage01-60.log`. Frame caps were CLI-only. |
+| Resized visual output | Pass | `stage01-60.png` shows square cells, the separate instruction line and a head distinguishable from the body. |
+| All four Input Map actions | Pass | `stage01-bindings.log` reports `STAGE01_BINDINGS_PASS actions=4` using arrow events and physical WASD events with Cyrillic logical keycodes. |
+| Interactive editor smoke | Pass | F5 showed the grid, three cells, distinct head and instructions. The Snake moved to the right edge, stopped, and moved up after an Up press. F8 stopped the run. The editor debugger showed zero errors and warnings. |
+| Full manual editor scenario | NotRun | The UI automation key press for A produced no visible turn. Physical WASD with the Russian keyboard layout remains unverified on real hardware. Rapid turns, echo, resizing and both FPS caps were checked in the standalone graphical run only. |

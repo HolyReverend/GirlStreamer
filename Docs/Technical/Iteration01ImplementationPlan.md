@@ -81,7 +81,7 @@ Each stage delivers one mechanic and its directly required scene/UI wiring. Link
 
 ### 1. Grid movement and steering
 
-- [ ] Create the Snake scene/model/renderer and minimal runnable session composition; configure main scene and movement actions. Implement fixed-tick movement, one buffered turn and reverse rejection.
+- [x] Create the Snake scene/model/renderer and minimal runnable session composition; configure main scene and movement actions. Implement fixed-tick movement, one buffered turn and reverse rejection.
 - **Deliverable:** visibly controllable Snake on a readable grid, with no food or messages yet.
 - **Focused check:** short model assertions for reverse rejection and two direction inputs within one tick; editor play verifies keys and consistent movement pacing at two render frame rates.
 - **Detailed plan:** [Stage01SnakeMovement.md](Iteration01/Stage01SnakeMovement.md).

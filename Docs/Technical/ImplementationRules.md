@@ -11,6 +11,7 @@ Read this file only when working directly with the project engine: code, assets,
 
 ## Before changes
 
+- Read [Architecture.md](Architecture.md) first to locate the relevant systems and their owning files, then inspect only the sources needed for the task.
 - Work inside `GirlStreamer/` for engine files. Keep documentation in `Docs/` and agent workflow files in `Codex/`.
 - Inspect the actual project, engine version, existing implementation, and relevant local instructions before choosing an approach.
 - Read only the technical documents and specific gameplay rules needed for the task.
@@ -25,6 +26,7 @@ Read this file only when working directly with the project engine: code, assets,
 
 ## Verification and handoff
 
+- After every Godot task, review [Architecture.md](Architecture.md) and update it to reflect changed files, responsibilities, connections, contracts, tests, and implemented systems. Do not present planned systems as implemented. If no architecture update is needed, state that in the handoff.
 - Run checks appropriate to the change: build, focused tests, or editor checks as needed.
 - Distinguish verified results from assumptions and checks not run. Do not claim success without evidence.
 - Update affected technical documentation and link to existing design rules instead of duplicating them.

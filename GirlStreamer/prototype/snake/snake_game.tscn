@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://prototype/snake/snake_game.gd" id="1_game"]
+[ext_resource type="Script" path="res://prototype/snake/snake_board.gd" id="2_board"]
+
+[node name="SnakeGame" type="Node"]
+script = ExtResource("1_game")
+
+[node name="Board" type="Node2D" parent="."]
+script = ExtResource("2_board")
