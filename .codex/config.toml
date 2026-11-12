@@ -1,0 +1,6 @@
+[mcp_servers.godot_girlstreamer]
+command = 'C:\Program Files\nodejs\node.exe'
+args = ['E:\Projects\VibeCoding\GirlStreamerProject\Codex\Tools\FunplayMCP\launch.mjs']
+startup_timeout_sec = 20
+tool_timeout_sec = 90
+enabled = true

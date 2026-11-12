@@ -1,0 +1,162 @@
+{
+  "source_commit": "25eec57919aec2cfd87d4ef9ae5661832302585e",
+  "base_skill_sha256": "b905f10ed48a810853da51d614700046620a74a3566bf2f7d1a4ad7e8dbdf347",
+  "files": [
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\REFERENCE.md",
+      "sha256": "81a343e9cac2bcfa5f21be0016afe8291e0adfea33331c20e7885d8a887bb7d6"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\SKILL.md",
+      "sha256": "3660d38c34084e8dc24e417db95cf7461e6a25ade3fb0a4572f9a098a87ad664"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript\\references\\annotations-and-typing.md",
+      "sha256": "f6324887e8e9610077f719c879da303b77b16e9dd60d49b6fa7350ad8b0f9669"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript-headless-testing\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript-headless-testing\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript-headless-testing\\SKILL.md",
+      "sha256": "2eb72fe20af359c023af582b1cc876d857424549df5ba4e9f10724d69c1ecd7a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-gdscript-headless-testing\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\REFERENCE.md",
+      "sha256": "c04121e2be640b5d2e20d8a8e4811997b65c851a88822ec300ec87d50c68c73b"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\SKILL.md",
+      "sha256": "402219b84824d41e237eb0c026cd7339e05eb6b0c2436eb9a33757657caab362"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-nodes-scenes\\references\\tree-and-instancing.md",
+      "sha256": "e49a78a44e1beb078e73ddee2e8b76ad8a607c3eb5b748406c292b43cf0d3284"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\REFERENCE.md",
+      "sha256": "b0e719c166273bb3ad1de6191b59f9a74f9b0cf3049829a53af7f993b6b9a759"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\SKILL.md",
+      "sha256": "0bb1104546bb765daa90fa371f29e85081b5f5c5fd1831c630eb4713f9b72b4e"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-resources\\references\\resource-patterns.md",
+      "sha256": "fe06e7641fe1f67b5feb25f6ec6adb525a0b291f234af7c43193e8358392edcb"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\REFERENCE.md",
+      "sha256": "491a2bf41187d0e4093dadc5409c898933cc9257cbfa6cb5e908a43be431d8f6"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\SKILL.md",
+      "sha256": "d3c0c43bd701b4194dadbc86c34648bd41d7122be92e6e35e599755e589eb9c1"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-signals-groups\\references\\signal-patterns.md",
+      "sha256": "7c77f9b238bcda44545c9df2da1d1f761799e869c6f3ee3014e0358fa6e76552"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\REFERENCE.md",
+      "sha256": "76047d4245870244f78a0737987c056030880ca4006363d856db5c8950ab47ff"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\SKILL.md",
+      "sha256": "6de9563b19a8f108a97fe340ac0eb7c1d2b8a02fdfcfaa53e9adda8bd66fc886"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\godot-ui-control\\references\\layout-and-theming.md",
+      "sha256": "f5b6895b78944db9be91b6bae976ee73b52d72ce3065427fb52d98efe26493b1"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\save-systems\\LICENSE",
+      "sha256": "6f82dcfeb95a1c0a0452180a3b16f21bf82111780018fed59d95a052b5b75f6c"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\save-systems\\NOTICE",
+      "sha256": "2dcb65b1c5be24e5ba11e937f3996100f4e980d8cf8ac5b30ba1d70dae6c40f8"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\save-systems\\SKILL.md",
+      "sha256": "0872c84f2078a87a71bedaef292e38e7f15edda81a1d337ea243dd12c8fc5a89"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\save-systems\\SOURCE.md",
+      "sha256": "858d62401d2e4ce53815d9baa24a9124f283a298939d85c75d566e6753147b1a"
+    },
+    {
+      "path": "C:\\Users\\DrDre\\.codex\\skills\\save-systems\\references\\versioning-and-migration.md",
+      "sha256": "4778412e39ba4635b74aab48db1be18b70062cef2db4426a336fecc65dae202d"
+    }
+  ]
+}

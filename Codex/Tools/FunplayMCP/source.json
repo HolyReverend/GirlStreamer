@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/FunplayAI/funplay-godot-mcp",
+  "commit": "ec595d2d9b3e664bf7d15064f140f121c07e7d97",
+  "version": "0.10.1",
+  "license": "MIT",
+  "installed": "2026-11-11",
+  "addon": "GirlStreamer/addons/funplay_mcp",
+  "wrapper": "Codex/Tools/FunplayMCP/funplay-godot-mcp.mjs",
+  "localFiles": [
+    "Codex/Tools/FunplayMCP/launch.mjs"
+  ],
+  "note": "Upstream wrapper renamed .js to .mjs; addon source unchanged."
+}
