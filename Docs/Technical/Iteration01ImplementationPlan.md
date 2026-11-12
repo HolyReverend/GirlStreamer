@@ -102,14 +102,14 @@ Each stage delivers one mechanic and its directly required scene/UI wiring. Link
 
 ### 4. Timed session and session results
 
-- [ ] Implement session states, 360-second countdown, aggregate food/attempt results, finish and new-session restart. Enforce time limits during both active play and retry waiting.
+- [x] Implement session states, 360-second countdown, aggregate food/attempt results, finish and new-session restart. Enforce time limits during both active play and retry waiting.
 - **Deliverable:** multiple attempts within one bounded session; final screen with a restart action.
 - **Focused check:** use a shortened duration to verify retry preserves the deadline, expiry prevents further movement/retry, and a new session resets clock and totals exactly once.
 - **Detailed plan:** [Stage04TimedSession.md](Iteration01/Stage04TimedSession.md).
 
 ### 5. Quick questions and keyboard answers
 
-- [ ] Add the message controller and reserved HUD area, placeholder prompts, three numbered options, scheduling, response deadline and brief answer/expiry feedback. Enable an Inspector switch for a message-free baseline.
+- [x] Add the message controller and reserved HUD area, placeholder prompts, three numbered options, scheduling, response deadline and brief answer/expiry feedback. Enable an Inspector switch for a message-free baseline.
 - **Deliverable:** answers by 1/2/3 during uninterrupted Snake play, with neither rewards nor contextual links.
 - **Focused check:** manually steer while answering each option and confirm the board stays visible and speed stays unchanged. A small controller check verifies single resolution under repeated input, expiration, no overlap and cancellation on session finish; retry must not reset an open question.
 - **Detailed plan:** [Stage05QuickMessages.md](Iteration01/Stage05QuickMessages.md).

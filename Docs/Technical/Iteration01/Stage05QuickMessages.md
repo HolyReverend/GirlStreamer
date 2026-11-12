@@ -1,6 +1,6 @@
 # Stage 5: Quick Questions and Keyboard Answers — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: planned; engine implementation and playtest acceptance are not claimed.
+Date: 2026-11-12. Status: implemented and technically verified; manual playtest acceptance open.
 
 **Goal:** Let the player read a short question and choose one of three answers with keys 1–3 while Snake continues normally, then assess whether this interaction is manageable.
 
@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: planned; engine implementation and playtest acceptance
 
 **Specification:** [Iteration roadmap](../Iteration01ImplementationPlan.md), Stage 5 and iteration evaluation; [Stage 4](Stage04TimedSession.md); [Streaming gameplay](../../GameDesign/Mechanics/StreamingGameplay.md), simultaneous play and single-choice constraints; [Minigames](../../GameDesign/Mechanics/Minigames.md), chat compatibility. The user's deliberately simplified question experiment takes precedence over the complete streaming design.
 
-This document plans future work only. Before execution, read the project workflow and engine implementation rules, use the whole-stage workflow and inspect actual Stage 1–4 implementation/evidence. Documents alone do not prove those stages exist. Reconcile current interfaces before editing. No engine work is authorized by writing this plan.
+Stage 5 extends the accepted Stage 1–4 implementation. The execution record below separates technical evidence from human playtest observations.
 
 ## 1. Scope and initial settings
 
@@ -159,18 +159,20 @@ On resolution, the parent clears the choice and reads feedback from QuickMessage
 
 ### A. Question controller and input
 
-- [ ] Inspect actual Stage 4 startup/finish/time sampling and HUD wiring; preserve its expiry-before-action contract.
-- [ ] Add the focused controller checks from Section 8 and confirm failures against missing question behavior.
-- [ ] Implement typed content/state, finite scheduling, one resolution path and injected time sampling.
-- [ ] Register the three answer actions and implement event-based input with exact question/session deadline behavior.
+- [x] Inspect actual Stage 4 startup/finish/time sampling and HUD wiring; preserve its expiry-before-action contract.
+- [x] Add the focused controller checks from Section 8 and confirm failures against missing question behavior.
+- [x] Implement typed content/state, finite scheduling, one resolution path and injected time sampling.
+- [x] Register the three answer actions and implement event-based input with exact question/session deadline behavior.
 
 ### B. Integrate session and presentation
 
-- [ ] Add the controller Node, parent-driven ticking and once-only signal connections; integrate start/finish without touching attempt reset.
-- [ ] Add counters and response-time samples; account cancellation before summary generation and reset metrics only on new session.
-- [ ] Reserve the stable message column, add choice/feedback/results presentation and preserve BoardArea rectangle reporting.
-- [ ] Run focused integration checks and the short editor scenario. Fix callback-order or ownership issues at their owner rather than adding a second clock or duplicate counters.
-- [ ] Restore normal settings and perform the paired evaluation below, recording observations and any `NotRun` limitations.
+- [x] Add the controller Node, parent-driven ticking and once-only signal connections; integrate start/finish without touching attempt reset.
+- [x] Add counters and response-time samples; account cancellation before summary generation and reset metrics only on new session.
+- [x] Reserve the stable message column, add choice/feedback/results presentation and preserve BoardArea rectangle reporting.
+- [x] Run focused integration checks and the shortened standalone graphical scenario.
+- [ ] Run the short interactive editor scenario.
+- [x] Preserve the normal preset and record verification limits.
+- [ ] Perform the paired human evaluation below.
 
 ## 8. Necessary verification
 
@@ -209,11 +211,34 @@ Write observations after play in `Docs/Technical/Iteration01/PlaytestResults.md`
 
 There is no predeclared pass-rate threshold or statistical claim from two runs. A difficult result is valid evidence: adjust one of window, gap, wording or Snake speed at a time and repeat only the relevant comparison. Stage-based Snake remains a potential next-iteration decision, not an automatic scope expansion here.
 
-- [ ] One question at a time is readable in a separate stable region, with exactly three options selected by 1–3.
-- [ ] Answering never changes Snake speed/rules or pauses it; retry never resets an open question or its deadline.
-- [ ] Answer, expiration and cancellation each resolve once with the defined priority and metrics.
-- [ ] Session finish/reset closes old input/state cleanly and produces a consistent summary; disabled baseline remains playable.
+- [x] One question at a time is readable in a separate stable region, with exactly three options selected by 1–3.
+- [x] Answering never changes Snake speed/rules or pauses it; retry never resets an open question or its deadline.
+- [x] Answer, expiration and cancellation each resolve once with the defined priority and metrics.
+- [x] Session finish/reset closes old input/state cleanly and produces a consistent summary; disabled baseline remains playable.
 - [ ] Focused automated checks and the short editor scenario have recorded evidence; normal settings are restored.
-- [ ] Paired human playtest findings and limitations are recorded, or experiential acceptance is explicitly NotRun.
+- [x] Paired human playtest findings and limitations are recorded, or experiential acceptance is explicitly NotRun.
 
 Report actual changed files, performed checks and remaining decisions. Completing the functional prototype does not validate the full streaming system, final balance or comfort without the playtest evidence.
+
+## 10. Execution record
+
+Baseline: `34dfe69`, with Stage 4 and earlier acceptance documentation already in the working tree. This task records Stage 4 acceptance from the user's manual report. Verified with Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility.
+
+| Changed files | Result |
+| --- | --- |
+| [quick_messages.gd](../../../GirlStreamer/prototype/messages/quick_messages.gd) and its UID | Three Russian questions, integer-millisecond scheduling, physical number-key input, resolution and feedback. |
+| [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd), [prototype_session.tscn](../../../GirlStreamer/prototype/prototype_session.tscn) | Session-owned controller, one clock sample, configuration, metrics and cancellation before the final snapshot. |
+| [prototype_hud.gd](../../../GirlStreamer/prototype/ui/prototype_hud.gd), [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [project.godot](../../../GirlStreamer/project.godot) | Fixed question region, metrics in results and physical top-row bindings. |
+| [test_quick_messages.gd](../../../GirlStreamer/tests/iteration01/test_quick_messages.gd) and its UID, [test_timed_session.gd](../../../GirlStreamer/tests/iteration01/test_timed_session.gd) | Five question test groups and an explicitly disabled baseline for the timer-only fixtures. |
+| [Stage 4 plan](Stage04TimedSession.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Acceptance, evidence and runtime ownership. |
+
+Local logs and temporary probes are under `GirlStreamer/.godot/`. Godot commands used `--path GirlStreamer`.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Baseline and intentional wrong expectation | Expected failures | Exit 1 for the missing controller and for an incorrect expected answer rate, with no unexpected engine errors. See `stage05-messages-red.log` and `stage05-messages-negative.log`. |
+| Quick messages and timed session runners | Pass | Both exited 0. `STAGE05_MESSAGES_PASS groups=5` and `STAGE04_SESSION_PASS groups=5`. See `stage05-quick_messages.log` and `stage05-timed_session.log`. |
+| Editor import and normal scene startup | Pass | `--headless --import` and `--headless --quit-after 120` exited 0 with no engine/script errors. See `stage05-import-console.log` and `stage05-smoke.log`. |
+| Short graphical scenario | Pass | The standalone main scene used a controlled clock and actual viewport input. It accepted 1, 2 and 3 during Snake movement, expired two choices, preserved the open deadline across a retry, and cancelled one choice at session expiry. Enter reset the metrics and started the disabled baseline. Board geometry matched across question, feedback and disabled states at fixed viewport size, and the board resized at 1160×800. Captures at 1024×768 show the prompt and results outside the board. See `stage05-graphical.log`, `stage05-question.png` and `stage05-results.png`. |
+| Short interactive editor play | NotRun | The scripted graphical scenario exercised the shortened settings. Manual steering/answer comfort and the editor debugger were not observed. The 360/45/45/5 defaults remain configured; shortened settings were local to the probe instance. |
+| Paired six-minute human playtest | NotRun | Experiential acceptance remains open. Record a baseline and an enabled run with the same fixed seed and settings in `PlaytestResults.md` after play. No synthetic measurements are substituted for human observations. |

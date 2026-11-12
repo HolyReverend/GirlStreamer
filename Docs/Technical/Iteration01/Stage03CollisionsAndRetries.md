@@ -1,6 +1,6 @@
 # Stage 3: Collisions and Retrying an Attempt — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: implemented and technically verified; awaiting manual editor acceptance.
+Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Goal:** End a Snake attempt on wall/self collision and let the player start a fresh attempt with Space without reloading the session scene.
 
@@ -218,3 +218,4 @@ Local evidence is under the ignored `GirlStreamer/.godot/` directory. The Godot 
 | Retry with invalid settings | Pass | A temporary probe set the grid below its supported minimum before retrying. The controller reported the expected validation error, entered STOPPED and replaced the retry prompt with the settings error. See `stage03-invalid-retry.log`. |
 | Interactive editor wall and retry smoke | Pass | F5 reached a frozen wall collision and showed the Space prompt. Space started a three-cell attempt with food, score zero and a cleared prompt. F8 stopped the game. The editor showed zero runtime errors and warnings after stopping. |
 | Full interactive editor scenario | Partial | Food collection before collision, self-collision and holding Space across a collision were verified by the standalone graphical probe with injected key events. Those parts were not repeated by hand in the editor. |
+| User manual play | Pass | On 2026-11-12 the user confirmed wall and self collisions, a fresh attempt on Space, and no restart when holding the key. This confirmation and the recorded technical checks establish Stage 3 acceptance. |

@@ -155,6 +155,7 @@ func _finish_controller_once() -> bool:
 	# Adding the scene to the ready root initializes its onready fields synchronously.
 	root.add_child(game)
 	game.set_physics_process(false)
+	game.set_action_authorizer(_allow_action)
 	game.start()
 
 	var state := Fixture.new()
@@ -182,3 +183,7 @@ func _finish_controller_once() -> bool:
 	var unchanged := events == expected_events and state.get_body_cells() == full_body
 	game.free()
 	return valid_completion and unchanged
+
+
+func _allow_action() -> bool:
+	return true

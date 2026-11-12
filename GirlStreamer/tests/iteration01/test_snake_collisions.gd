@@ -2,8 +2,14 @@ extends SceneTree
 
 const SNAKE_GAME = preload("res://prototype/snake/snake_game.tscn")
 const SESSION = preload("res://prototype/prototype_session.tscn")
+const SessionScript = preload("res://prototype/prototype_session.gd")
 const FoodChecks = preload("res://tests/iteration01/test_snake_food.gd")
 const GRID := Vector2i(8, 8)
+
+
+class ClockSession extends SessionScript:
+	func _now_msec() -> int:
+		return 1000
 
 
 class Fixture extends SnakeState:
@@ -100,6 +106,7 @@ func _controller_finishes_once() -> bool:
 	_configure(game)
 	root.add_child(game)
 	game.set_physics_process(false)
+	game.set_action_authorizer(_allow_action)
 	game.start()
 	var state := _wall_fixture()
 	game.set("_state", state)
@@ -123,6 +130,7 @@ func _controller_finishes_once() -> bool:
 
 func _parent_retries() -> bool:
 	var session := SESSION.instantiate()
+	session.set_script(ClockSession)
 	var game := session.get_node("SnakeGame") as SnakeGame
 	_configure(game)
 	root.add_child(session)
@@ -219,6 +227,10 @@ func _configure(game: SnakeGame) -> void:
 	game.columns = GRID.x
 	game.rows = GRID.y
 	game.use_fixed_seed = true
+
+
+func _allow_action() -> bool:
+	return true
 
 
 func _record_events(game: SnakeGame) -> Array[Array]:

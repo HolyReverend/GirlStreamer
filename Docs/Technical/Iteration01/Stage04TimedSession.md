@@ -1,6 +1,6 @@
 # Stage 4: Timed Session and Session Results — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: planned; implementation and runtime acceptance are not claimed.
+Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Goal:** Combine multiple Snake attempts into one 360-second session, retain aggregate results across retries, stop at the deadline and allow a fresh session from the results screen.
 
@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: planned; implementation and runtime acceptance are not
 
 **Specification:** [Iteration 1 roadmap](../Iteration01ImplementationPlan.md), Stage 4 and shared contracts; [Stage 3](Stage03CollisionsAndRetries.md); [Stage 2](Stage02FoodAndGrowth.md); [Core gameplay loop](../../GameDesign/Mechanics/CoreGameplayLoop.md), session duration section.
 
-This is a documentation-only plan. Before implementation, follow the project workflow, engine implementation rules and whole-stage workflow. Inspect actual Stage 1–3 code and validation evidence; plans do not prove implementation. Reconcile implemented interfaces before editing. Checkboxes below describe future work.
+Stage 4 extends the accepted Stage 1–3 implementation. The execution record below separates automated checks from editor observations.
 
 ## 1. Scope and player-visible behavior
 
@@ -139,18 +139,19 @@ Route an input using the session state at handler entry. For either recognized s
 
 ### A. Session state and time authority
 
-- [ ] Inspect accepted Stage 1–3 implementation, especially parent input, startup order, synchronous signal connections and generic stop behavior.
-- [ ] Add controlled-clock deadline tests from Section 8 and confirm meaningful failures against the untimed session.
-- [ ] Implement the session enum, snapshotted duration, monotonic time source, expiry transition and guarded startup/retry.
-- [ ] Install the action authorizer and enforce it before Snake input/each step; preserve the existing accumulator and model rules.
+- [x] Inspect accepted Stage 1–3 implementation, especially parent input, startup order, synchronous signal connections and generic stop behavior.
+- [x] Add controlled-clock deadline tests from Section 8 and confirm meaningful failures against the untimed session.
+- [x] Implement the session enum, snapshotted duration, monotonic time source, expiry transition and guarded startup/retry.
+- [x] Install the action authorizer and enforce it before Snake input/each step; preserve the existing accumulator and model rules.
 
 ### B. Results and new-session flow
 
-- [ ] Implement event-based aggregate counters, reset baseline and successful-attempt counting.
-- [ ] Extend HUD with time/total/results presentation and add Enter input. Ensure layout callbacks never reset clocks or totals.
-- [ ] Adapt prior standalone controller fixtures and parent retry tests to explicit authorization/controlled time.
-- [ ] Run the focused session tests and relevant controller regressions; perform the shortened editor scenario below.
-- [ ] Record evidence and `NotRun` checks, restoring the normal 360-second preset after short manual testing.
+- [x] Implement event-based aggregate counters, reset baseline and successful-attempt counting.
+- [x] Extend HUD with time/total/results presentation and add Enter input. Ensure layout callbacks never reset clocks or totals.
+- [x] Adapt prior standalone controller fixtures and parent retry tests to explicit authorization/controlled time.
+- [x] Run the focused session tests and relevant controller regressions.
+- [ ] Perform the full shortened editor scenario.
+- [x] Record evidence and `NotRun` checks, restoring the normal 360-second preset after short manual testing.
 
 ## 8. Necessary verification
 
@@ -184,11 +185,36 @@ Do not run the six-minute divided-attention playtest yet: it belongs to the comb
 
 ## 9. Acceptance and Stage 5 handoff
 
-- [ ] One session deadline survives all attempt failures and retries; time continues while waiting.
-- [ ] Deadline checks prevent new movement/retry at expiry regardless of callback order; results freeze once.
-- [ ] Food and attempt/outcome totals match the defined accounting, including an unfinished final attempt.
-- [ ] Enter starts one fresh session, reusing scene instances and clearing clock, totals, attempt state and old summary.
-- [ ] Focused tests, relevant controller regressions and the shortened editor scenario have recorded outcomes; normal duration is restored.
-- [ ] Report actual changed files, commands/results and `NotRun` checks; do not claim final balance or messaging validation.
+- [x] One session deadline survives all attempt failures and retries; time continues while waiting.
+- [x] Deadline checks prevent new movement/retry at expiry regardless of callback order; results freeze once.
+- [x] Food and attempt/outcome totals match the defined accounting, including an unfinished final attempt.
+- [x] Enter starts one fresh session, reusing scene instances and clearing clock, totals, attempt state and old summary.
+- [x] Focused tests and relevant controller regressions have recorded outcomes; the normal duration remains configured.
+- [ ] The full shortened editor scenario is verified.
+- [x] Report actual changed files, commands/results and `NotRun` checks; do not claim final balance or messaging validation.
 
 Stage 5 will attach its message lifecycle to session start/finish, reuse `_sample_running_time_msec()` for authorized updates/answers and cancel an active question before publishing session results. Attempt retry must never reset that message clock/state. No stub message manager or question-related metrics are required before that stage.
+
+## 10. Execution record
+
+Baseline: `34dfe69`, clean before recording Stage 3 acceptance. Verified with Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility.
+
+| Changed files | Result |
+| --- | --- |
+| [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd) | Session states, monotonic deadline, totals, guarded Space retry and Enter restart. |
+| [snake_game.gd](../../../GirlStreamer/prototype/snake/snake_game.gd) | Parent authorization before steering and each due step. Preserves the last admitted board snapshot if expiry cuts off catch-up. |
+| [prototype_hud.gd](../../../GirlStreamer/prototype/ui/prototype_hud.gd), [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [project.godot](../../../GirlStreamer/project.godot) | Countdown, session food, results and Enter action. |
+| [test_timed_session.gd](../../../GirlStreamer/tests/iteration01/test_timed_session.gd) and its UID | Five controlled-clock test groups. |
+| [test_snake_collisions.gd](../../../GirlStreamer/tests/iteration01/test_snake_collisions.gd), [test_snake_food.gd](../../../GirlStreamer/tests/iteration01/test_snake_food.gd) | Existing tests use a frozen session clock or explicit controller authorization. |
+| [Stage 3 plan](Stage03CollisionsAndRetries.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Stage 3 acceptance, implementation status, evidence and current ownership. |
+
+Local logs and probes are under the ignored `GirlStreamer/.godot/` directory. Godot commands used `--path GirlStreamer`.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Untimed baseline and intentional wrong expectation | Expected failures | Exit 1 in both cases. The baseline lacked remaining time and the negative fixture rejected an incorrect summary. See `stage04-red.log` and `stage04-negative.log`. |
+| Timed session, collision and food runners | Pass | Exit 0 for all three. `STAGE04_SESSION_PASS groups=5`, `STAGE03_COLLISIONS_PASS groups=5`, `STAGE02_FOOD_PASS checks=5`. See `stage04-timed_session.log`, `stage04-snake_collisions.log` and `stage04-snake_food.log`. |
+| Editor import and scene startup | Pass | `--headless --import` and `--headless --quit-after 120` exited 0 without engine or script errors. See `stage04-import-console.log` and `stage04-smoke.log`. |
+| Graphical session check | Pass | The actual main scene showed 06:00 with default settings. Two probe-only 15-second runs used real monotonic time and injected key events. The first preserved time and total food on Space, expired during play, and restarted on Enter with cleared totals. The second expired while waiting for retry. See `stage04-graphical.log` and `stage04-results.png`. The 15-second override was confined to the probe instance. |
+| Interactive editor | NotRun | The editor launch did not expose a usable window, and the targeted retry timed out. F5 and the editor debugger were not checked. The standalone graphical run verified both shortened scenarios and the default 06:00 display. |
+| User manual play | Pass | On 2026-11-12 the user confirmed that Space preserves the timer and aggregate results, expiry shows results, and Enter starts a new session. This confirmation and the recorded technical checks establish Stage 4 acceptance. |

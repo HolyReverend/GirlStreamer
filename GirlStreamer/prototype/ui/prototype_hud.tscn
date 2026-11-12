@@ -30,6 +30,16 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
 
+[node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Time: 00:00"
+horizontal_alignment = 1
+
+[node name="SessionFoodLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Session food: 0"
+horizontal_alignment = 1
+
 [node name="ScoreLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Score: 0"
@@ -40,13 +50,159 @@ visible = false
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="BoardArea" type="Control" parent="MarginContainer/VBoxContainer"]
+[node name="PlayArea" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="BoardArea" type="Control" parent="MarginContainer/VBoxContainer/PlayArea"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
 
+[node name="MessageArea" type="Control" parent="MarginContainer/VBoxContainer/PlayArea"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="MessageContent" type="VBoxContainer" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderSlot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/HeaderSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "Вопросы отключены"
+vertical_alignment = 1
+
+[node name="PromptSlot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/PromptSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CountdownSlot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CountdownLabel" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/CountdownSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+
+[node name="Option1Slot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Option1Label" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/Option1Slot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+
+[node name="Option2Slot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Option2Label" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/Option2Slot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+
+[node name="Option3Slot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Option3Label" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/Option3Slot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+
+[node name="FeedbackSlot" type="Control" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FeedbackLabel" type="Label" parent="MarginContainer/VBoxContainer/PlayArea/MessageArea/MarginContainer/MessageContent/FeedbackSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+vertical_alignment = 1
+autowrap_mode = 3
+
 [node name="Instructions" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Arrow keys / WASD — steer. Space — retry after an attempt ends."
+horizontal_alignment = 1
+
+[node name="ResultsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ResultsLabel" type="Label" parent="MarginContainer/VBoxContainer/ResultsPanel"]
+layout_mode = 2
 horizontal_alignment = 1

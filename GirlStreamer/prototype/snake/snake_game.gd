@@ -25,12 +25,16 @@ var _active_grid_size: Vector2i
 var _active_tick_seconds: float
 var _attempt_state: AttemptState = AttemptState.STOPPED
 var _accumulator_seconds := 0.0
+var _action_authorizer: Callable
 
 @onready var _board: SnakeBoard = $Board
 
 
 func start() -> void:
 	stop()
+	if not _action_authorizer.is_valid():
+		push_error("SnakeGame requires an action authorizer.")
+		return
 	if columns < 8 or columns > 64 or rows < 8 or rows > 64:
 		push_error("SnakeGame requires grid dimensions between 8 and 64.")
 		return
@@ -75,13 +79,28 @@ func set_board_rect(rect: Rect2) -> void:
 	_board.set_board_rect(rect)
 
 
+func set_action_authorizer(authorizer: Callable) -> void:
+	_action_authorizer = authorizer
+
+
+func _is_action_authorized() -> bool:
+	if not _action_authorizer.is_valid():
+		push_error("SnakeGame lost its action authorizer.")
+		stop()
+		return false
+	# Expiry can stop this controller synchronously inside the callback.
+	return _action_authorizer.call() and is_playing()
+
+
 func _physics_process(delta: float) -> void:
-	if not is_playing():
+	if not is_playing() or not _is_action_authorized():
 		return
 	_accumulator_seconds += delta
 	var moved := false
 	# Allow for rounding when a whole number of physics frames equals a tick.
 	while is_playing() and _accumulator_seconds + TICK_EPSILON_SECONDS >= _active_tick_seconds:
+		if not _is_action_authorized():
+			break
 		_accumulator_seconds = maxf(0.0, _accumulator_seconds - _active_tick_seconds)
 		var previous_score := _state.get_score()
 		if _state.step():
@@ -113,6 +132,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	for action: StringName in MOVE_DIRECTIONS:
 		if event.is_action_pressed(action):
+			if not _is_action_authorized():
+				return
 			_state.request_turn(MOVE_DIRECTIONS[action])
 			get_viewport().set_input_as_handled()
 			return
