@@ -1,6 +1,6 @@
 # Stage 3: Collisions and Retrying an Attempt — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: planned; no engine implementation or acceptance implied.
+Date: 2026-11-12. Status: implemented and technically verified; awaiting manual editor acceptance.
 
 **Goal:** End a Snake attempt on wall/self collision and let the player start a fresh attempt with Space without reloading the session scene.
 
@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: planned; no engine implementation or acceptance implie
 
 **Specification:** [Iteration 1 roadmap](../Iteration01ImplementationPlan.md), Stage 3 and shared contracts; [Stage 1](Stage01SnakeMovement.md); [Stage 2](Stage02FoodAndGrowth.md); [Minigames](../../GameDesign/Mechanics/Minigames.md), attempt and Snake rules.
 
-This document plans future work only. Before implementation, read the project workflow and engine implementation rules, use the whole-stage workflow, and inspect actual Stage 1–2 code and acceptance evidence. Their documents do not establish that the code has been implemented. Reconcile actual interfaces with this plan before editing; do not create replacement systems alongside the existing ones.
+Stage 3 extends the accepted Stage 1–2 implementation. The execution record below records verified behavior and any open editor checks.
 
 ## 1. Behavior and scope
 
@@ -132,18 +132,19 @@ Keep final score displayed until retry emits zero. Change the instruction label 
 
 ### A. Collision rules
 
-- [ ] Inspect actual Stage 1–2 model, controller and tests; confirm their accepted behavior and reconcile interface differences.
-- [ ] Add the wall, self-collision and vacating-tail cases below; confirm meaningful failures before replacing temporary behavior.
-- [ ] Implement terminal reason/queries and collision checks before movement/food mutation. Preserve the existing seed, score and growth contracts.
-- [ ] Adapt obsolete earlier fixtures/expectations and run the focused model checks.
+- [x] Inspect actual Stage 1–2 model, controller and tests; confirm their accepted behavior and reconcile interface differences.
+- [x] Add the wall, self-collision and vacating-tail cases below; confirm meaningful failures before replacing temporary behavior.
+- [x] Implement terminal reason/queries and collision checks before movement/food mutation. Preserve the existing seed, score and growth contracts.
+- [x] Adapt obsolete earlier fixtures/expectations and run the focused model checks.
 
 ### B. Attempt lifecycle and retry
 
-- [ ] Replace the controller's writable running flag with the enum; update all users/tests and implement guarded restart/queries.
-- [ ] Handle all terminal reasons once, including collisions whose `step()` returns false. Preserve score-before-finish ordering for `board_full`.
-- [ ] Add Space action, parent authorization helper and status text changes. Reuse existing nodes/model reset path and connections.
-- [ ] Run the lifecycle/retry integration checks and one editor scenario. Fix ownership/state errors rather than adding duplicate flags to the HUD/session.
-- [ ] Record actual commands, outcomes and `NotRun` checks. No implementation checkboxes are complete merely because this document exists.
+- [x] Replace the controller's writable running flag with the enum; update all users/tests and implement guarded restart/queries.
+- [x] Handle all terminal reasons once, including collisions whose `step()` returns false. Preserve score-before-finish ordering for `board_full`.
+- [x] Add Space action, parent authorization helper and status text changes. Reuse existing nodes/model reset path and connections.
+- [x] Run the lifecycle/retry integration checks.
+- [ ] Run the full editor scenario.
+- [x] Record actual commands, outcomes and `NotRun` checks. No implementation checkboxes are complete merely because this document exists.
 
 ## 7. Necessary verification
 
@@ -183,11 +184,37 @@ This establishes actual key handling and readable feedback; deterministic fixtur
 
 ## 8. Acceptance and handoff
 
-- [ ] Walls and retained body cells end an attempt before invalid movement or reward effects.
-- [ ] Entering the vacating tail cell works on a nongrowing step.
-- [ ] Collision and full-board completion each notify once and leave Snake waiting without pausing the scene tree.
-- [ ] Space retries through the parent only while waiting, resetting attempt state without recreating session nodes or reconnecting signals.
-- [ ] Focused model/lifecycle checks, adapted earlier checks and the editor scenario pass with recorded evidence.
-- [ ] Report every changed file, actual checks and remaining `NotRun` items; distinguish planned future session behavior from tested behavior.
+- [x] Walls and retained body cells end an attempt before invalid movement or reward effects.
+- [x] Entering the vacating tail cell works on a nongrowing step.
+- [x] Collision and full-board completion each notify once and leave Snake waiting without pausing the scene tree.
+- [x] Space retries through the parent only while waiting, resetting attempt state without recreating session nodes or reconnecting signals.
+- [x] Focused model/lifecycle checks and adapted earlier checks pass with recorded evidence.
+- [ ] The full editor scenario passes with recorded evidence.
+- [x] Report every changed file, actual checks and remaining `NotRun` items; distinguish planned future session behavior from tested behavior.
 
 Stage 4 extends the parent's retry authorization with session state/deadline checks and keeps its clock/totals outside the attempt reset. Stage 5 keeps any active question and its deadline outside that reset too. Those integrations are future work, not hidden Stage 3 prerequisites.
+
+## 9. Execution record
+
+Baseline: `808d394`, with uncommitted Stage 2 implementation and earlier documentation already present. Stage 2 acceptance now records the user's manual check. Verified on Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility.
+
+| Changed files | Result |
+| --- | --- |
+| [snake_state.gd](../../../GirlStreamer/prototype/snake/snake_state.gd) | Wall and retained-body collision, vacating-tail exception and one terminal reason. |
+| [snake_game.gd](../../../GirlStreamer/prototype/snake/snake_game.gd) | Attempt lifecycle, single terminal event and guarded restart with fresh timing. |
+| [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd), [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [project.godot](../../../GirlStreamer/project.godot) | Parent-routed Space action, reason-specific prompts and updated controls. |
+| [test_snake_collisions.gd](../../../GirlStreamer/tests/iteration01/test_snake_collisions.gd) and its UID | Five model and session check groups. |
+| [test_snake_food.gd](../../../GirlStreamer/tests/iteration01/test_snake_food.gd), [test_snake_movement.gd](../../../GirlStreamer/tests/iteration01/test_snake_movement.gd) | Assert retry eligibility on full board and remove the obsolete boundary-guard case. |
+| [Stage 2 plan](Stage02FoodAndGrowth.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Acceptance, verification evidence, progress and current ownership. |
+
+Local evidence is under the ignored `GirlStreamer/.godot/` directory. The Godot commands used `--path GirlStreamer`.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Old model and intentional wrong expectation | Expected failures | Exit 1 in both cases. The old wall guard failed the terminal-state check; the negative fixture rejected an incorrect collision reason. See `stage03-collisions-red.log` and `stage03-collisions-negative.log`. |
+| Collision, food and movement runners | Pass | Exit 0 in all three, with `STAGE03_COLLISIONS_PASS groups=5`, `STAGE02_FOOD_PASS checks=5` and `STAGE01_MOVEMENT_PASS checks=4`. Logs: `stage03-collisions.log`, `stage03-food.log`, `stage03-movement.log`. |
+| Editor import and startup | Pass | `--headless --import` and `--headless --quit-after 120` returned 0 with no engine or script errors. See `stage03-import-console.log` and `stage03-smoke.log`. |
+| Standalone graphical play | Pass | A fixed-seed probe drove the main scene through viewport key events. It collected food, hit the body and wall, observed each frozen board and retained score, then retried each with Space. Waiting steering, Space echo/release and Space during play did not reset the attempt. See `stage03-graphical.log`, `stage03-self.png` and `stage03-wall.png`. |
+| Retry with invalid settings | Pass | A temporary probe set the grid below its supported minimum before retrying. The controller reported the expected validation error, entered STOPPED and replaced the retry prompt with the settings error. See `stage03-invalid-retry.log`. |
+| Interactive editor wall and retry smoke | Pass | F5 reached a frozen wall collision and showed the Space prompt. Space started a three-cell attempt with food, score zero and a cleared prompt. F8 stopped the game. The editor showed zero runtime errors and warnings after stopping. |
+| Full interactive editor scenario | Partial | Food collection before collision, self-collision and holding Space across a collision were verified by the standalone graphical probe with injected key events. Those parts were not repeated by hand in the editor. |

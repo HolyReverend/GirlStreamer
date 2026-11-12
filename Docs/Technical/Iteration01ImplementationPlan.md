@@ -88,14 +88,14 @@ Each stage delivers one mechanic and its directly required scene/UI wiring. Link
 
 ### 2. Food collection and growth
 
-- [ ] Add food spawning, growth and attempt score; draw food and update the HUD from Snake notifications. Inject a controllable random seed for repeatable rule checks.
+- [x] Add food spawning, growth and attempt score; draw food and update the HUD from Snake notifications. Inject a controllable random seed for repeatable rule checks.
 - **Deliverable:** a playable collection loop that grows the body.
 - **Focused check:** eating grows exactly once and increments score once; food never occupies the body, including the final free cell. Handle a full board without an endless search.
 - **Detailed plan:** [Stage02FoodAndGrowth.md](Iteration01/Stage02FoodAndGrowth.md).
 
 ### 3. Collisions and retrying an attempt
 
-- [ ] Add wall/self collision, stopped-attempt feedback and Space retry. Reset all attempt state; distinguish moving into a tail cell that vacates this tick from colliding with a retained body cell.
+- [x] Add wall/self collision, stopped-attempt feedback and Space retry. Reset all attempt state; distinguish moving into a tail cell that vacates this tick from colliding with a retained body cell.
 - **Deliverable:** failure and quick recovery without reloading the whole session scene.
 - **Focused check:** wall collision, body collision and the vacating-tail case; one manual retry verifies a fresh body/food/score and no stale buffered turn.
 - **Detailed plan:** [Stage03CollisionsAndRetries.md](Iteration01/Stage03CollisionsAndRetries.md).

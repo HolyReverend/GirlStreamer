@@ -30,6 +30,16 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
 
+[node name="ScoreLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Score: 0"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+horizontal_alignment = 1
+
 [node name="BoardArea" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -38,5 +48,5 @@ mouse_filter = 2
 
 [node name="Instructions" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Arrow keys / WASD — steer   |   At the edge, turn to keep moving."
+text = "Arrow keys / WASD — steer. Space — retry after an attempt ends."
 horizontal_alignment = 1

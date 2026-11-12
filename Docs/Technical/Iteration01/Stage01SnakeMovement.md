@@ -1,6 +1,6 @@
 # Stage 1: Snake Movement — Detailed Implementation Plan
 
-Date: 2026-11-12. Status: implemented and technically verified; editor smoke passed; full manual input verification remains open.
+Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Goal:** Run the existing Godot project and control a visible, fixed-length Snake on a grid with predictable discrete movement and one buffered turn per tick.
 
@@ -230,4 +230,7 @@ All runs used the verified 4.7.2 console executable and `--path GirlStreamer`. L
 | Resized visual output | Pass | `stage01-60.png` shows square cells, the separate instruction line and a head distinguishable from the body. |
 | All four Input Map actions | Pass | `stage01-bindings.log` reports `STAGE01_BINDINGS_PASS actions=4` using arrow events and physical WASD events with Cyrillic logical keycodes. |
 | Interactive editor smoke | Pass | F5 showed the grid, three cells, distinct head and instructions. The Snake moved to the right edge, stopped, and moved up after an Up press. F8 stopped the run. The editor debugger showed zero errors and warnings. |
-| Full manual editor scenario | NotRun | The UI automation key press for A produced no visible turn. Physical WASD with the Russian keyboard layout remains unverified on real hardware. Rapid turns, echo, resizing and both FPS caps were checked in the standalone graphical run only. |
+| User keyboard check | Pass | On 2026-11-12 the user confirmed that arrow keys and WASD worked, including on the Russian keyboard layout. |
+| Editor scenario coverage | Partial | Startup, visible board and turning away from the edge were observed in the editor. Rapid turns, echo, resizing and both FPS caps were verified in the standalone graphical run. |
+
+The user accepted Stage 1 on 2026-11-12 after confirming keyboard operation. The acceptance combines the user''s keyboard check with the recorded editor and standalone results.

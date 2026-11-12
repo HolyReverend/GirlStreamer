@@ -5,10 +5,13 @@ const BACKGROUND := Color("#101a21")
 const GRID := Color("#293941")
 const BODY := Color("#47bb86")
 const HEAD := Color("#c2f58c")
+const FOOD := Color("#ffad66")
 
 var _board_rect: Rect2
 var _grid_size: Vector2i
 var _body: Array[Vector2i] = []
+var _food_present := false
+var _food_cell: Vector2i
 
 
 func set_board_rect(rect: Rect2) -> void:
@@ -16,9 +19,13 @@ func set_board_rect(rect: Rect2) -> void:
 	queue_redraw()
 
 
-func set_snapshot(grid_size: Vector2i, body_cells: Array[Vector2i]) -> void:
+func set_snapshot(
+	grid_size: Vector2i, body_cells: Array[Vector2i], food_present: bool, food_cell: Vector2i
+) -> void:
 	_grid_size = grid_size
 	_body = body_cells.duplicate()
+	_food_present = food_present
+	_food_cell = food_cell
 	queue_redraw()
 
 
@@ -37,7 +44,10 @@ func _draw() -> void:
 		draw_line(left, left + Vector2(size.x, 0), GRID, 1.0)
 
 	var segment_size := Vector2.ONE * cell_size
-	# Draw the head last so it stays visible even if segments overlap in Stage 1.
+	if _food_present:
+		var food_center := origin + (Vector2(_food_cell) + Vector2(0.5, 0.5)) * cell_size
+		draw_circle(food_center, cell_size * 0.28, FOOD, true, -1.0, true)
+	# Draw the head last so it stays visible when segments overlap.
 	for index in range(_body.size() - 1, -1, -1):
 		var segment := Rect2(origin + Vector2(_body[index]) * cell_size, segment_size)
 		draw_rect(segment.grow(-cell_size * 0.08), HEAD if index == 0 else BODY)

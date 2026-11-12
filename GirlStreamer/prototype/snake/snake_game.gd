@@ -1,6 +1,11 @@
 class_name SnakeGame
 extends Node
 
+signal score_changed(score: int)
+signal attempt_finished(reason: StringName, score: int)
+
+enum AttemptState { STOPPED, PLAYING, WAITING_FOR_RETRY }
+
 const MOVE_DIRECTIONS: Dictionary[StringName, Vector2i] = {
 	&"snake_up": Vector2i.UP,
 	&"snake_down": Vector2i.DOWN,
@@ -12,11 +17,13 @@ const TICK_EPSILON_SECONDS := 1.0e-9
 @export_range(8, 64) var columns: int = 24
 @export_range(8, 64) var rows: int = 18
 @export_range(0.05, 1.0, 0.01, "suffix:s") var tick_interval_seconds: float = 0.20
+@export var use_fixed_seed: bool = false
+@export var food_seed: int = 12345
 
 var _state := SnakeState.new()
 var _active_grid_size: Vector2i
 var _active_tick_seconds: float
-var _running := false
+var _attempt_state: AttemptState = AttemptState.STOPPED
 var _accumulator_seconds := 0.0
 
 @onready var _board: SnakeBoard = $Board
@@ -33,14 +40,35 @@ func start() -> void:
 
 	_active_grid_size = Vector2i(columns, rows)
 	_active_tick_seconds = tick_interval_seconds
-	_state.reset(_active_grid_size)
-	_board.set_snapshot(_active_grid_size, _state.get_body_cells())
-	_running = true
+	var random_source := RandomNumberGenerator.new()
+	if use_fixed_seed:
+		random_source.seed = food_seed
+	else:
+		random_source.randomize()
+	_state.reset(_active_grid_size, random_source)
+	_attempt_state = AttemptState.PLAYING
+	_publish_snapshot()
+	score_changed.emit(_state.get_score())
 
 
 func stop() -> void:
-	_running = false
+	_attempt_state = AttemptState.STOPPED
 	_accumulator_seconds = 0.0
+
+
+func restart_attempt() -> bool:
+	if not is_waiting_for_retry():
+		return false
+	start()
+	return is_playing()
+
+
+func is_playing() -> bool:
+	return _attempt_state == AttemptState.PLAYING
+
+
+func is_waiting_for_retry() -> bool:
+	return _attempt_state == AttemptState.WAITING_FOR_RETRY
 
 
 func set_board_rect(rect: Rect2) -> void:
@@ -48,21 +76,40 @@ func set_board_rect(rect: Rect2) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not _running:
+	if not is_playing():
 		return
 	_accumulator_seconds += delta
 	var moved := false
 	# Allow for rounding when a whole number of physics frames equals a tick.
-	while _accumulator_seconds + TICK_EPSILON_SECONDS >= _active_tick_seconds:
+	while is_playing() and _accumulator_seconds + TICK_EPSILON_SECONDS >= _active_tick_seconds:
 		_accumulator_seconds = maxf(0.0, _accumulator_seconds - _active_tick_seconds)
+		var previous_score := _state.get_score()
 		if _state.step():
 			moved = true
+		var score := _state.get_score()
+		if _state.is_finished():
+			var reason := _state.get_finish_reason()
+			_attempt_state = AttemptState.WAITING_FOR_RETRY
+			_accumulator_seconds = 0.0
+			_publish_snapshot()
+			if score != previous_score:
+				score_changed.emit(score)
+			attempt_finished.emit(reason, score)
+			return
+		if score != previous_score:
+			score_changed.emit(score)
 	if moved:
-		_board.set_snapshot(_active_grid_size, _state.get_body_cells())
+		_publish_snapshot()
+
+
+func _publish_snapshot() -> void:
+	_board.set_snapshot(
+		_active_grid_size, _state.get_body_cells(), _state.has_food(), _state.get_food_cell()
+	)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not _running or not event.is_pressed() or event.is_echo():
+	if not is_playing() or not event.is_pressed() or event.is_echo():
 		return
 	for action: StringName in MOVE_DIRECTIONS:
 		if event.is_action_pressed(action):

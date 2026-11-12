@@ -53,6 +53,11 @@ snake_right={
 ]
 }
 
+attempt_retry={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"keycode":32)]
+}
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
