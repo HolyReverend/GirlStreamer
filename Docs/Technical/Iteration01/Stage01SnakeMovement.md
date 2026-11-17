@@ -1,5 +1,7 @@
 # Stage 1: Snake Movement — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Goal:** Run the existing Godot project and control a visible, fixed-length Snake on a grid with predictable discrete movement and one buffered turn per tick.

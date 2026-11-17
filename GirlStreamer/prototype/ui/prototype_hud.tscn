@@ -94,7 +94,13 @@ mouse_filter = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="BoardArea" type="Control" parent="MarginContainer/VBoxContainer/MainArea"]
+[node name="LeftColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BoardArea" type="Control" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn"]
 layout_mode = 2
 mouse_filter = 2
 custom_minimum_size = Vector2(480, 360)
@@ -130,76 +136,6 @@ mouse_filter = 2
 text = "Чат"
 horizontal_alignment = 1
 
-[node name="AudienceStrip" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent"]
-visible = false
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 1
-
-[node name="Totals" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 14
-clip_text = true
-
-[node name="Gamers" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-clip_text = true
-
-[node name="Social" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-clip_text = true
-
-[node name="Image" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-clip_text = true
-
-[node name="Explanation" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip"]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-autowrap_mode = 3
-max_lines_visible = 3
-clip_text = true
-
-[node name="DonationStrip" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 1
-
-[node name="Total" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/DonationStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 14
-text = "Донаты: 0"
-clip_text = true
-
-[node name="NotificationSlot" type="Control" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/DonationStrip"]
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-mouse_filter = 2
-clip_contents = true
-
-[node name="Notification" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/DonationStrip/NotificationSlot"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 14
-max_lines_visible = 2
-text_overrun_behavior = 3
-clip_text = true
-
 [node name="ChatHistory" type="RichTextLabel" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -211,53 +147,181 @@ fit_content = false
 scroll_following = true
 autowrap_mode = 3
 
-[node name="ChoiceArea" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+[node name="StatisticsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn"]
+custom_minimum_size = Vector2(0, 233)
 layout_mode = 2
 mouse_filter = 2
-custom_minimum_size = Vector2(0, 180)
+
+[node name="StatisticsContent" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AudienceStrip" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 1
+
+[node name="Totals" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+clip_text = true
+
+[node name="Gamers" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+clip_text = true
+
+[node name="Social" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+clip_text = true
+
+[node name="Image" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+clip_text = true
+
+[node name="Explanation" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+theme_override_constants/line_spacing = 0
+max_lines_visible = 3
+clip_text = true
+
+[node name="DonationStrip" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 1
+
+[node name="Total" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/DonationStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+text = "Донаты: 0"
+clip_text = true
+
+[node name="NotificationSlot" type="Control" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/DonationStrip"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+mouse_filter = 2
+clip_contents = true
+
+[node name="Notification" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/DonationStrip/NotificationSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+theme_override_constants/line_spacing = 0
+max_lines_visible = 2
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="ChoiceArea" type="MarginContainer" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn"]
+layout_mode = 2
+mouse_filter = 2
+custom_minimum_size = Vector2(0, 182)
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="MessageContent" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ChoiceArea"]
+[node name="MessageContent" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
+[node name="Heading" type="HBoxContainer" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent"]
 layout_mode = 2
 mouse_filter = 2
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent/Heading"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+size_flags_horizontal = 3
 clip_text = true
 
-[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
+[node name="CountdownLabel" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent/Heading"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_font_sizes/font_size = 14
 clip_text = true
 
-[node name="CountdownLabel" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
+[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent"]
+custom_minimum_size = Vector2(0, 40)
+autowrap_mode = 3
+max_lines_visible = 2
+text_overrun_behavior = 3
 layout_mode = 2
 mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+theme_override_constants/line_spacing = 0
+
+[node name="Options" type="GridContainer" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent"]
+layout_mode = 2
+mouse_filter = 2
+columns = 2
+theme_override_constants/v_separation = 2
+
+[node name="Option1Label" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent/Options"]
+custom_minimum_size = Vector2(0, 40)
+autowrap_mode = 3
+max_lines_visible = 2
+text_overrun_behavior = 3
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+theme_override_constants/line_spacing = 0
+
+[node name="Option2Label" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent/Options"]
+custom_minimum_size = Vector2(0, 40)
+autowrap_mode = 3
+max_lines_visible = 2
+text_overrun_behavior = 3
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+theme_override_constants/line_spacing = 0
+
+[node name="Option3Label" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent/Options"]
+custom_minimum_size = Vector2(0, 40)
+autowrap_mode = 3
+max_lines_visible = 2
+text_overrun_behavior = 3
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+theme_override_constants/line_spacing = 0
+
+[node name="FeedbackLabel" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
 clip_text = true
 
-[node name="Option1Label" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
+[node name="Instructions" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn"]
 layout_mode = 2
 mouse_filter = 2
-clip_text = true
-
-[node name="Option2Label" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
-layout_mode = 2
-mouse_filter = 2
-clip_text = true
-
-[node name="Option3Label" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
-layout_mode = 2
-mouse_filter = 2
-clip_text = true
-
-[node name="FeedbackLabel" type="Label" parent="MarginContainer/VBoxContainer/ChoiceArea/MessageContent"]
-layout_mode = 2
-mouse_filter = 2
+custom_minimum_size = Vector2(0, 40)
+theme_override_font_sizes/font_size = 14
+text = "Enter — начать стрим"
+horizontal_alignment = 1
+vertical_alignment = 1
 clip_text = true
 
 [node name="ResultsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
@@ -277,12 +341,12 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
 
-[node name="Instructions" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="ResultsInstructions" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 mouse_filter = 2
 custom_minimum_size = Vector2(0, 40)
 theme_override_font_sizes/font_size = 14
-text = "Enter — начать стрим"
+text = "Enter — новый стрим"
 horizontal_alignment = 1
 vertical_alignment = 1
-clip_text = true

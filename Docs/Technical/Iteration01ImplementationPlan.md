@@ -1,5 +1,7 @@
 # Iteration 1: Snake and Quick Messages — Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Date: 2026-11-12. Status: proposed technical roadmap; no implementation or playtest acceptance implied.
 
 **Goal:** Build a playable Godot prototype to assess whether a player can read short questions and select one of three answers while controlling Snake.

@@ -7,8 +7,9 @@ const QUESTION_CONTEXT_TTL_MSEC := 15000
 const REACTION_WINDOW_MSEC := 3000
 const DEFAULT_QUESTION_WINDOW_MSEC := 6000
 
-@export_range(1.0, 120.0, 0.1) var first_delay_seconds := 30.0
-@export_range(1.0, 120.0, 0.1) var gap_seconds := 25.0
+@export_range(1.0, 120.0, 0.1) var first_delay_seconds := 20.0
+## Minimum active time between successful openings.
+@export_range(1.0, 120.0, 0.1) var gap_seconds := 20.0
 @export_range(1.0, 30.0, 0.1) var reaction_ttl_seconds := 8.0
 @export_range(1.0, 120.0, 0.1) var donation_ttl_seconds := 45.0
 @export_range(1.0, 120.0, 0.1) var reaction_cooldown_seconds := 60.0
@@ -134,8 +135,6 @@ func on_choice_resolved(resolution: Content.ChoiceResolution) -> void:
 	if resolution == null or _active_choice_id == 0 or resolution.choice_id != _active_choice_id:
 		return
 	_active_choice_id = 0
-	if _enabled and resolution.outcome in [&"answered", &"expired"]:
-		_next_open_msec = resolution.resolved_at_msec + _gap_msec
 
 
 func tick(now_msec: int, snake_playing: bool) -> void:
@@ -212,6 +211,7 @@ func _try_open(definition: Content.ChoiceDefinition, now_msec: int) -> bool:
 		return false
 	_active_choice_id = definition.id
 	_opened_count += 1
+	_next_open_msec = now_msec + _gap_msec
 	if _opened_count >= _opening_limit:
 		_clear_pending()
 	return true

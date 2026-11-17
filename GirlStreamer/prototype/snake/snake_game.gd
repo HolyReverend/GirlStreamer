@@ -13,6 +13,7 @@ const MOVE_DIRECTIONS: Dictionary[StringName, Vector2i] = {
 	&"snake_right": Vector2i.RIGHT,
 }
 const TICK_EPSILON_SECONDS := 1.0e-9
+const BASE_SPEED_BONUS_PER_FOOD := 0.10
 
 @export_range(8, 64) var columns: int = 24
 @export_range(8, 64) var rows: int = 18
@@ -22,6 +23,7 @@ const TICK_EPSILON_SECONDS := 1.0e-9
 
 var _state := SnakeState.new()
 var _active_grid_size: Vector2i
+var _base_tick_seconds: float
 var _active_tick_seconds: float
 var _attempt_state: AttemptState = AttemptState.STOPPED
 var _accumulator_seconds := 0.0
@@ -43,7 +45,8 @@ func start() -> void:
 		return
 
 	_active_grid_size = Vector2i(columns, rows)
-	_active_tick_seconds = tick_interval_seconds
+	_base_tick_seconds = tick_interval_seconds
+	_active_tick_seconds = _base_tick_seconds
 	var random_source := RandomNumberGenerator.new()
 	if use_fixed_seed:
 		random_source.seed = food_seed
@@ -110,16 +113,20 @@ func _physics_process(delta: float) -> void:
 		if _state.step():
 			moved = true
 		var score := _state.get_score()
+		var ate_food := score != previous_score
+		if ate_food:
+			# The elapsed cost above belongs to the completed step.
+			_active_tick_seconds = _base_tick_seconds / (1.0 + BASE_SPEED_BONUS_PER_FOOD * score)
 		if _state.is_finished():
 			var reason := _state.get_finish_reason()
 			_attempt_state = AttemptState.WAITING_FOR_RETRY
 			_accumulator_seconds = 0.0
 			_publish_snapshot()
-			if score != previous_score:
+			if ate_food:
 				score_changed.emit(score)
 			attempt_finished.emit(reason, score)
 			return
-		if score != previous_score:
+		if ate_food:
 			score_changed.emit(score)
 	if moved:
 		_publish_snapshot()

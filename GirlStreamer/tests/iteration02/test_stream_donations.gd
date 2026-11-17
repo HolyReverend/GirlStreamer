@@ -234,12 +234,12 @@ func _payment_routing_and_outcomes() -> bool:
 	if not choice.is_open() or choice._active.kind != &"donation_question":
 		session.free()
 		return false
-	controller.draws.append(0.99)
+	controller.draws.append_array([0.0, 0.0, 0.50, 0.0])
 	session.now = 68000
 	var before_expiry := session.get_audience_snapshot().impressions
 	session._process(0.0)
 	result = choice.get_last_resolution()
-	if result.outcome != &"expired" or controller.get_total() != 25:
+	if result.outcome != &"expired" or controller.get_total() != 30:
 		session.free()
 		return false
 	var expected := Vector3.ZERO
@@ -251,9 +251,6 @@ func _payment_routing_and_outcomes() -> bool:
 	if session._audience_causes[-1].delta != expected or not controller.sampled_impressions.is_equal_approx(passive + expected):
 		session.free()
 		return false
-	controller.draws.append_array([0.0, 0.0, 0.50, 0.0])
-	session.now = 69000
-	session._process(0.0)
 	if not choice.is_open() or choice._active.kind != &"donation_question":
 		session.free()
 		return false

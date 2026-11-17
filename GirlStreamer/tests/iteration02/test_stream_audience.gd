@@ -146,11 +146,11 @@ func _near(first: float, second: float) -> bool:
 
 func _scenarios() -> bool:
 	var model := Audience.new()
-	_advance(model, 360)
+	_advance(model, 180)
 	var baseline := model.get_snapshot()
 	print("AUDIENCE_SCENARIO baseline initial=30 counts=", baseline.counts, " peak=", baseline.peak,
 		" impressions=", baseline.impressions)
-	if baseline.counts != Vector3i(28, 28, 28) or baseline.peak != 84:
+	if baseline.counts != Vector3i(19, 19, 19) or baseline.peak != 57:
 		return false
 	for strategy: StringName in [&"achievement", &"communication", &"repeated_loss"]:
 		var result := await _play_scenario(strategy)
@@ -165,6 +165,13 @@ func _play_scenario(strategy: StringName) -> Dictionary:
 	var node := SESSION.instantiate()
 	node.set_script(Timed.ClockSession)
 	var session := node as Timed.ClockSession
+	if strategy == &"repeated_loss":
+		# Leave the shared window available at three spaced loss events to exercise suppression.
+		session.session_duration_seconds = 360
+		var director := session.get_node("StreamDirector") as StreamDirector
+		director.first_delay_seconds = 85.2
+		director.gap_seconds = 84.0
+	var duration_msec := session.session_duration_seconds * 1000
 	var game := session.get_node("SnakeGame") as SnakeGame
 	var choice := session.get_node("StreamChoice") as Choice
 	game.columns = 64
@@ -190,9 +197,9 @@ func _play_scenario(strategy: StringName) -> Dictionary:
 	var loss_bonuses := 0
 	var loss_suppressions := 0
 	var last_cause: RefCounted
-	for time in range(TICK_MSEC, 360001, TICK_MSEC):
+	for time in range(TICK_MSEC, duration_msec + 1, TICK_MSEC):
 		session.now = 1000 + time
-		if time < 360000:
+		if time < duration_msec:
 			_drive_snake(session, game, strategy, time)
 		if not session._audience_causes.is_empty() and last_cause != session._audience_causes[-1]:
 			last_cause = session._audience_causes[-1]
@@ -274,7 +281,7 @@ func _drive_snake(session: Timed.ClockSession, game: SnakeGame, strategy: String
 			collect = game._state.get_score() < 5 and time < 214000 and time >= 24400
 			hit_wall = (
 				time < 8000 or (time >= 85000 and time < 100000)
-				or (time >= 169000 and time < 178000) or (time >= 235000 and time < 245000)
+				or (time >= 169000 and time < 178000) or (time >= 253000 and time < 260000)
 				or time >= 260000
 			)
 	# Safe rectangular circuit except when deliberately missing a corner.
@@ -292,21 +299,21 @@ func _drive_snake(session: Timed.ClockSession, game: SnakeGame, strategy: String
 	if target != direction:
 		state.request_turn(target)
 	state.set("_food_cell", head + target if collect else Vector2i.ZERO)
-	game._physics_process(TICK_MSEC / 1000.0)
+	game._physics_process(game._active_tick_seconds)
 
 
 func _valid_scenario_result(strategy: StringName, result: Dictionary) -> bool:
 	var counts: Vector3i = result.counts
 	var impressions: Vector3 = result.impressions
 	if (
-		result.steps != 360 or counts.clamp(Vector3i.ZERO, Vector3i(200, 200, 200)) != counts
+		result.steps != (360 if strategy == &"repeated_loss" else 180) or counts.clamp(Vector3i.ZERO, Vector3i(200, 200, 200)) != counts
 		or impressions.clamp(Vector3.ZERO, Vector3(100, 100, 100)) != impressions
 		or result.questions.x + result.reactions.x > 8
 	):
 		return false
 	match strategy:
 		&"achievement":
-			return result.milestones == [5, 10, 20] and result.records == [6, 11, 21] and result.reactions.y > 0
+			return result.milestones == [5, 10, 20] and result.records == [6, 11] and result.reactions.y > 0
 		&"communication":
 			return result.questions == Vector2i(6, 6) and result.reactions == Vector2i.ZERO
 		&"repeated_loss":

@@ -1,5 +1,7 @@
 # Stage 1: Stream Shell and Pause-Aware Lifetime — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Plan date: 2026-11-12. Implemented, headless-verified and manually accepted by the user on 2026-11-13.
 
 > **For agentic workers:** Use `stage-orchestrator` when executing the whole stage and `executing-plans` for its steps, subject to AGENTS.md. One writer owns the session/HUD integration and one owner controls the editor. No automatic commit or push.

@@ -171,7 +171,7 @@ func _reentrant_cancel() -> bool:
 	)
 
 
-func _session(duration: int = 360, delay: float = 30.0, gap: float = 25.0,
+func _session(duration: int = 180, delay: float = 20.0, gap: float = 20.0,
 		enabled: bool = true) -> TimedChecks.ClockSession:
 	var node := SessionScene.instantiate()
 	node.set_script(TimedChecks.ClockSession)
@@ -222,14 +222,14 @@ func _default_schedule() -> bool:
 	var session := await _session()
 	if session == null:
 		return false
-	_tick(session, 29999)
+	_tick(session, 19999)
 	if not _opens.is_empty():
 		return false
-	_tick(session, 30000)
+	_tick(session, 20000)
 	# Neutral organic growth has brought the audience to 33 at the first opening.
 	if _opens.size() != 1 or _opens[0].window_msec != 5970:
 		return false
-	_tick(session, 32000)
+	_tick(session, 22000)
 	_key(KEY_UP)
 	var game := _game(session)
 	var state := game.get("_state") as SnakeState
@@ -243,11 +243,11 @@ func _default_schedule() -> bool:
 	):
 		return false
 	game._physics_process(2.0)
-	_tick(session, 200000)
+	_tick(session, 50000)
 	if not game.is_waiting_for_retry() or _opens.size() != 1:
 		return false
 	_key(KEY_SPACE)
-	_tick(session, 200001)
+	_tick(session, 50001)
 	return _opens.size() == 2 and _opens[1].id == 2 and _opens[0].template_id != _opens[1].template_id
 
 
@@ -330,17 +330,17 @@ func _exhausted_general_pool() -> bool:
 
 
 func _finish_metrics_and_restart() -> bool:
-	var session := await _session(16, 1.0, 1.0)
+	var session := await _session(21, 1.0, 7.0)
 	if session == null:
 		return false
 	_tick(session, 1000)
 	_tick(session, 1500)
 	_key(KEY_3)
-	_tick(session, 2500)
-	_tick(session, 8500)
-	_tick(session, 10000)
-	# The stream and choice deadlines both fall at 16000.
-	_tick(session, 15999)
+	_tick(session, 8000)
+	_tick(session, 14000)
+	_tick(session, 15000)
+	# The stream and choice deadlines both fall at 21000.
+	_tick(session, 20999)
 	session.now += 1
 	_key(KEY_1)
 	_key(KEY_1)

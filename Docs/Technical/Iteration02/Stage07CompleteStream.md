@@ -1,5 +1,7 @@
 # Stage 7: Complete Stream and Iteration Acceptance — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Plan date: 2026-11-13. Implemented and technically verified on 2026-11-16. Final playtest acceptance remains open.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. One writer owns session/HUD integration and one owner controls the editor and standalone test instance. No automatic commits or pushes.
@@ -16,9 +18,9 @@ Plan date: 2026-11-13. Implemented and technically verified on 2026-11-16. Final
 
 The user accepted Stages 1–6 before this stage. The current implementation reuses their runtime owners and finish timing.
 
-Include a short goodbye using the existing placeholder webcam, three distinct sound cues and mute, consolidated frozen results, up to three evidenced highlights, lifecycle stress checks, full six-minute manual playtests and a concise acceptance report.
+Include a short goodbye using the existing placeholder webcam, three distinct sound cues and mute, consolidated frozen results, up to three evidenced highlights, lifecycle stress checks, full three-minute manual playtests and a concise acceptance report.
 
-Exclude new gameplay systems, another minigame, production art, voice, music, persistent settings/saves, analytics infrastructure, exported executable/package, performance benchmark suite and new devices/platforms. Standalone validation means launching the existing Godot project outside embedded editor play, not building an export. Use the existing default 360-second stream; shortened fixtures test boundaries only.
+Exclude new gameplay systems, another minigame, production art, voice, music, persistent settings/saves, analytics infrastructure, exported executable/package, performance benchmark suite and new devices/platforms. Standalone validation means launching the existing Godot project outside embedded editor play, not building an export. Use the new 180-second stream preset after implementing the correction plan; shortened fixtures test boundaries only.
 
 This is an integration and acceptance stage. Fix demonstrated defects in the owning subsystem and update its focused checks. Do not use “polish” as authorization for unrelated mechanics or a broad architecture rewrite. Separate completion of deterministic rules from subjective playability/balance acceptance.
 
@@ -136,8 +138,8 @@ For final acceptance run the existing Stage 1–6 owning runners once on the sta
 Create a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` only when actual evaluation starts. Record engine version, tested source revision or exact changed-file state, settings/content version, seeds, window size, input method, tester and date. Do not require a new commit merely to identify the candidate. Record whether the run used normal or shortened settings and whether any events were forced.
 
 1. **First-use check:** start from a fresh process, read Russian controls, start the stream without developer instructions, identify game/webcam/chat/choice regions, use pause and mute, then find the restart action. If the tester already knows the game, record that limitation rather than claiming a new-player study.
-2. **Gameplay-focused full run:** six minutes at normal settings, prioritize Snake progress but interact when practical. Record mistakes, answered/missed questions, chosen reactions, audience trajectory, donations and observed causes.
-3. **Communication-focused full run:** same initial settings and RNG seeds, six minutes prioritizing varied answers/reactions while keeping the game going. Same seeds do not guarantee equal donation results because audience and timing differ. Compare readable choices and consequences, not just final money.
+2. **Gameplay-focused full run:** three minutes at normal settings, prioritize Snake progress but interact when practical. Record mistakes, answered/missed questions, chosen reactions, audience trajectory, donations and observed causes.
+3. **Communication-focused full run:** same initial settings and RNG seeds, three minutes prioritizing varied answers/reactions while keeping the game going. Same seeds do not guarantee equal donation results because audience and timing differ. Compare readable choices and consequences, not just final money.
 4. **Short abuse/recovery run:** deliberately repeat quick losses and the same reaction style when actually available. Confirm no additional positive loss effects after the allowed two, style attenuation, continued ability to retry and recover. Preserve director gates; do not manufacture unlimited QTEs to make the test easier.
 5. **Standalone lifecycle/audio check:** launch the project outside embedded editor play, inspect 1024 × 768 and one larger size, hear each cue using a deterministic fixture if needed, toggle mute, pause/resume, close/restart a stream and exit cleanly. This does not require an export/package or a second editor owner.
 

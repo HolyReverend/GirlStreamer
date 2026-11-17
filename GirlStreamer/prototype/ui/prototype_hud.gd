@@ -29,19 +29,20 @@ var _donation_overflow_count := 0
 var _donation_overflow_amount := 0
 
 @onready var _main_area: Control = $MarginContainer/VBoxContainer/MainArea
-@onready var _board_area: Control = $MarginContainer/VBoxContainer/MainArea/BoardArea
+@onready var _board_area: Control = $MarginContainer/VBoxContainer/MainArea/LeftColumn/BoardArea
 @onready var _webcam: WebcamView = (
 	$MarginContainer/VBoxContainer/MainArea/SideColumn/WebcamSlot/HeroWebcam
 )
 @onready var _chat_history: RichTextLabel = (
 	$MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/ChatHistory
 )
-@onready var _donation_strip: VBoxContainer = _chat_history.get_parent().get_node("DonationStrip")
+@onready var _statistics_content: VBoxContainer = (
+	$MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent
+)
+@onready var _donation_strip: VBoxContainer = _statistics_content.get_node("DonationStrip")
 @onready var _donation_total: Label = _donation_strip.get_node("Total")
 @onready var _donation_notification: Label = _donation_strip.get_node("NotificationSlot/Notification")
-@onready var _audience_strip: VBoxContainer = (
-	$MarginContainer/VBoxContainer/MainArea/SideColumn/ChatSlot/ChatContent/AudienceStrip
-)
+@onready var _audience_strip: VBoxContainer = _statistics_content.get_node("AudienceStrip")
 @onready var _audience_totals: Label = _audience_strip.get_node("Totals")
 @onready var _audience_explanation: Label = _audience_strip.get_node("Explanation")
 @onready var _audience_groups: Array[Label] = [
@@ -53,23 +54,24 @@ var _donation_overflow_amount := 0
 @onready var _status_label: Label = $MarginContainer/VBoxContainer/Header/StatusLabel
 @onready var _time_label: Label = $MarginContainer/VBoxContainer/Header/Stats/TimeLabel
 @onready var _session_food_label: Label = $MarginContainer/VBoxContainer/Header/Stats/SessionFoodLabel
-@onready var _choice_area: Control = $MarginContainer/VBoxContainer/ChoiceArea
-@onready var _instructions: Label = $MarginContainer/VBoxContainer/Instructions
+@onready var _choice_area: Control = $MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea
+@onready var _results_instructions: Label = $MarginContainer/VBoxContainer/ResultsInstructions
+@onready var _instructions: Label = $MarginContainer/VBoxContainer/MainArea/LeftColumn/Instructions
 @onready var _results_panel: PanelContainer = $MarginContainer/VBoxContainer/ResultsPanel
 @onready var _mute_label: Label = $MarginContainer/VBoxContainer/Header/Stats/MuteLabel
 @onready var _results_scroll: ScrollContainer = _results_panel.get_node("ResultsScroll")
 @onready var _results_label: Label = _results_scroll.get_node("ResultsLabel")
 @onready var _message_content: VBoxContainer = (
-	$MarginContainer/VBoxContainer/ChoiceArea/MessageContent
+	$MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent
 )
-@onready var _message_header: Label = _message_content.get_node("HeaderLabel")
+@onready var _message_header: Label = _message_content.get_node("Heading/HeaderLabel")
 @onready var _message_prompt: Label = _message_content.get_node("PromptLabel")
-@onready var _message_countdown: Label = _message_content.get_node("CountdownLabel")
+@onready var _message_countdown: Label = _message_content.get_node("Heading/CountdownLabel")
 @onready var _message_feedback: Label = _message_content.get_node("FeedbackLabel")
 @onready var _message_options: Array[Label] = [
-	_message_content.get_node("Option1Label") as Label,
-	_message_content.get_node("Option2Label") as Label,
-	_message_content.get_node("Option3Label") as Label,
+	_message_content.get_node("Options/Option1Label") as Label,
+	_message_content.get_node("Options/Option2Label") as Label,
+	_message_content.get_node("Options/Option3Label") as Label,
 ]
 
 
@@ -140,7 +142,6 @@ func _show_donation(record: Content.DonationRecord, now_msec: int) -> void:
 
 
 func set_audience(snapshot: Audience.Snapshot, explanation: String) -> void:
-	_audience_strip.visible = snapshot != null
 	if snapshot == null:
 		_audience_totals.text = ""
 		_audience_explanation.text = ""
@@ -176,6 +177,7 @@ func set_status(message: String) -> void:
 func show_ready() -> void:
 	_paused = false
 	_results_panel.hide()
+	_results_instructions.hide()
 	_main_area.show()
 	_choice_area.show()
 	set_status("Готова к эфиру")
@@ -247,7 +249,7 @@ func show_stream_results(results: StreamResults) -> void:
 	_results_label.text = "\n".join(rows)
 	_paused = false
 	set_status("Итоги эфира")
-	_instructions.text = "Enter — новый стрим"
+	_results_instructions.show()
 	_main_area.hide()
 	_choice_area.hide()
 	_results_panel.show()
@@ -306,6 +308,7 @@ func _append_choice_counts(
 func hide_session_results() -> void:
 	_paused = false
 	_results_panel.hide()
+	_results_instructions.hide()
 	_main_area.show()
 	_choice_area.show()
 	set_status("")

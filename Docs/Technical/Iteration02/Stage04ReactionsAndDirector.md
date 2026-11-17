@@ -1,5 +1,7 @@
 # Stage 4: Reactions and One Interaction Scheduler — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Plan date: 2026-11-13. Implemented.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. One writer owns session/content integration and one owner controls the editor. No automatic commits or pushes.

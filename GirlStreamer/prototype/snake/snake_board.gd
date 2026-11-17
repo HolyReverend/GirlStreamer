@@ -34,7 +34,10 @@ func _draw() -> void:
 		return
 	var cell_size := minf(_board_rect.size.x / _grid_size.x, _board_rect.size.y / _grid_size.y)
 	var size := Vector2(_grid_size) * cell_size
-	var origin := _board_rect.position + (_board_rect.size - size) * 0.5
+	# Keep the visible bottom edge aligned with chat even when width limits the scale.
+	var origin := _board_rect.position + Vector2(
+		(_board_rect.size.x - size.x) * 0.5, _board_rect.size.y - size.y
+	)
 	draw_rect(Rect2(origin, size), BACKGROUND)
 	for column in range(1, _grid_size.x):
 		var top := origin + Vector2(column * cell_size, 0)

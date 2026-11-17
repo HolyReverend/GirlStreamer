@@ -18,6 +18,7 @@ Use [Technical/](Technical/) for the roadmap, implementation stages, architectur
 
 - [Iteration01ImplementationPlan.md](Technical/Iteration01ImplementationPlan.md): first-iteration roadmap for Snake and keyboard quick-message responses, shared architecture, stage boundaries and focused checks.
 - [Iteration02ImplementationPlan.md](Technical/Iteration02ImplementationPlan.md): second-iteration staged implementation plan, ownership, proposed tuning and acceptance checks.
+- [Iteration01And02Corrections.md](Technical/Iteration01And02Corrections.md): corrections to stream duration, interaction cadence, Snake acceleration and HUD placement; supersedes conflicting original stage requirements.
 - [Architecture.md](Technical/Architecture.md): current file ownership, scene/data connections, implemented systems, and focused entry points. Read before Godot work; update affected entries after it.
 
 Read [ImplementationRules.md](Technical/ImplementationRules.md) **only when working directly with the project engine**: engine code, assets, configuration, editor operations, builds, tests, or debugging. Do not load it for documentation-only tasks or game design discussions.

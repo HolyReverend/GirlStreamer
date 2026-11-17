@@ -301,7 +301,7 @@ func _presentation_and_input_boundary() -> bool:
 		and _results(session).is_visible_in_tree() and text.contains("Длительность: 00:02")
 		and text.contains("Собрано еды: 3") and text.contains("Начато попыток: 1")
 		and text.contains("Столкновения: 1") and text.contains("Заполнено полей: 0")
-		and _label(session, "Instructions").text == "Enter — новый стрим"
+		and _label(session, "ResultsInstructions").text == "Enter — новый стрим"
 	)
 	session.now = 4500
 	session._process(0.0)

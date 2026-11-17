@@ -16,7 +16,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var checks: Array[Callable] = [
-		_ready_requires_enter, _pause_excludes_wall_time, _pause_clears_pending_turn,
+		_default_deadline, _ready_requires_enter, _pause_excludes_wall_time, _pause_clears_pending_turn,
 		_pause_preserves_question_schedule, _pause_preserves_retry,
 		_actions_at_cutoff, _closing_and_restart, _bad_configuration,
 	]
@@ -32,7 +32,7 @@ func _run() -> void:
 	quit()
 
 
-func _make_session() -> TimedChecks.ClockSession:
+func _make_session(gap_seconds: float = 1.0) -> TimedChecks.ClockSession:
 	var scene := SESSION.instantiate()
 	scene.set_script(TimedChecks.ClockSession)
 	var session := scene as TimedChecks.ClockSession
@@ -40,7 +40,7 @@ func _make_session() -> TimedChecks.ClockSession:
 	session.messages_enabled = true
 	var director := session.get_node("StreamDirector") as Director
 	director.first_delay_seconds = 1.0
-	director.gap_seconds = 1.0
+	director.gap_seconds = gap_seconds
 	session.question_window_seconds = 2.0
 	var game := _game(session)
 	game.columns = 8
@@ -60,8 +60,8 @@ func _wait_for_layout(session: TimedChecks.ClockSession) -> bool:
 	return false
 
 
-func _running_session() -> TimedChecks.ClockSession:
-	var session := _make_session()
+func _running_session(gap_seconds: float = 1.0) -> TimedChecks.ClockSession:
+	var session := _make_session(gap_seconds)
 	if await _wait_for_layout(session) and session.start_session():
 		return session
 	return null
@@ -76,13 +76,13 @@ func _choice(session: TimedChecks.ClockSession) -> StreamChoice:
 
 
 func _board_rect(session: TimedChecks.ClockSession) -> Rect2:
-	var board := session.get_node(HUD_PATH + "MainArea/BoardArea") as Control
+	var board := session.get_node(HUD_PATH + "MainArea/LeftColumn/BoardArea") as Control
 	return board.get_global_rect()
 
 
 func _layout_fits(session: TimedChecks.ClockSession) -> bool:
 	var board := _board_rect(session)
-	var choice := (session.get_node(HUD_PATH + "ChoiceArea") as Control).get_global_rect()
+	var choice := (session.get_node(HUD_PATH + "MainArea/LeftColumn/ChoiceArea") as Control).get_global_rect()
 	var side_path := HUD_PATH + "MainArea/SideColumn/"
 	var webcam := (session.get_node(side_path + "WebcamSlot") as Control).get_global_rect()
 	var chat := (session.get_node(side_path + "ChatSlot") as Control).get_global_rect()
@@ -93,7 +93,7 @@ func _layout_fits(session: TimedChecks.ClockSession) -> bool:
 		and viewport.encloses(board) and viewport.encloses(choice)
 		and viewport.encloses(webcam) and viewport.encloses(chat)
 		and board.end.x <= webcam.position.x and webcam.end.y <= chat.position.y
-		and maxf(board.end.y, chat.end.y) <= choice.position.y
+		and board.end.y <= choice.position.y and choice.end.x <= chat.position.x
 	)
 
 
@@ -104,6 +104,43 @@ func _key(keycode: Key, pressed: bool = true, echo: bool = false) -> void:
 	event.pressed = pressed
 	event.echo = echo
 	root.push_input(event)
+
+
+func _default_deadline() -> bool:
+	var scene := SESSION.instantiate()
+	scene.set_script(TimedChecks.ClockSession)
+	var session := scene as TimedChecks.ClockSession
+	root.add_child(session)
+	session.set_process(false)
+	_game(session).set_physics_process(false)
+	if not await _wait_for_layout(session) or not session.start_session():
+		return false
+	var timer := session.get_node(HUD_PATH + "Header/Stats/TimeLabel") as Label
+	if timer.text != "Время: 03:00":
+		return false
+	var started := session.now
+	for due in range(10000, 180000, 10000):
+		session.now = started + due - 1
+		session._process(0.0)
+		if session._donations._next_due_msec != due:
+			return false
+		session.now = started + due
+		session._process(0.0)
+		if session._donations._next_due_msec != due + 10000:
+			return false
+	var paid := session._donations.get_count()
+	session.now = started + 179999
+	session._process(0.0)
+	if session._session_state != SessionState.RUNNING:
+		return false
+	session.now += 1
+	session._process(0.0)
+	return (
+		session._session_state == SessionState.CLOSING
+		and session._results.duration_seconds == 180.0
+		and session._results.audience.step_count == 180
+		and session._results.donation_count == paid
+	)
 
 
 func _ready_requires_enter() -> bool:
@@ -197,7 +234,7 @@ func _pause_clears_pending_turn() -> bool:
 
 
 func _pause_preserves_question_schedule() -> bool:
-	var session := await _running_session()
+	var session := await _running_session(2.0)
 	if session == null:
 		return false
 	var choice := _choice(session)
@@ -242,16 +279,16 @@ func _pause_preserves_question_schedule() -> bool:
 	if _feedback_is_empty(session) or _board_rect(session) != board:
 		return false
 	session.pause_session()
-	session.now = 83000
+	session.now = 82000
 	session._process(0.0)
 	if _feedback_is_empty(session):
 		return false
 	session.resume_session()
-	session.now = 83999
+	session.now = 82999
 	session._process(0.0)
 	if _feedback_is_empty(session) or session._questions_shown != 1:
 		return false
-	session.now = 84000
+	session.now = 83000
 	session._process(0.0)
 	session._process(0.0)
 	return _feedback_is_empty(session) and session._questions_shown == 2
@@ -393,5 +430,5 @@ func _bad_configuration() -> bool:
 
 
 func _feedback_is_empty(session: TimedChecks.ClockSession) -> bool:
-	var label := session.get_node(HUD_PATH + "ChoiceArea/MessageContent/FeedbackLabel") as Label
+	var label := session.get_node(HUD_PATH + "MainArea/LeftColumn/ChoiceArea/MessageContent/FeedbackLabel") as Label
 	return label.text.is_empty()

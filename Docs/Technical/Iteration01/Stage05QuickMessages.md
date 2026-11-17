@@ -1,5 +1,7 @@
 # Stage 5: Quick Questions and Keyboard Answers — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Date: 2026-11-12. Status: implemented and technically verified; manual playtest acceptance open.
 
 **Goal:** Let the player read a short question and choose one of three answers with keys 1–3 while Snake continues normally, then assess whether this interaction is manageable.

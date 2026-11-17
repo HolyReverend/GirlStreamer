@@ -27,7 +27,7 @@ class AudienceCause:
 	var explanation: String
 	var delta: Vector3
 
-@export_range(1, 600, 1, "suffix:s") var session_duration_seconds: int = 360
+@export_range(1, 600, 1, "suffix:s") var session_duration_seconds: int = 180
 @export var messages_enabled: bool = true
 @export_range(1.0, 15.0, 0.1, "suffix:s") var question_window_seconds: float = 6.0
 @export_range(1.0, 120.0, 0.1, "suffix:s") var record_reward_interval_seconds: float = 60.0

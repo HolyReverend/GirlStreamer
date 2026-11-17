@@ -8,6 +8,7 @@ const FoodChecks = preload("res://tests/iteration01/test_snake_food.gd")
 const SessionScript = preload("res://prototype/prototype_session.gd")
 const Event = preload("res://prototype/stream/stream_event.gd")
 const Feed = preload("res://prototype/stream/chat_feed.gd")
+const Audience = preload("res://prototype/stream/audience_state.gd")
 const Content = preload("res://prototype/stream/stream_content.gd")
 const Webcam = preload("res://prototype/ui/hero_webcam.gd")
 const HUD_PATH := "PrototypeHUD/MarginContainer/VBoxContainer/"
@@ -38,6 +39,7 @@ func _run() -> void:
 		_feed_cadence_and_history, _webcam_states, _score_and_retry,
 		_full_board, _cutoff_full_board, _pause_and_answers, _answer_at_cutoff,
 		_reaction_after_retry, _reaction_expiration, _snake_seed_independence, _full_feed_layout,
+		_populated_hud_layout,
 		_pending_reaction_pause_and_cutoff,
 		_audience_source_routing, _audience_choice_effects, _audience_sampled_timing,
 		_audience_boundary_partition,
@@ -654,9 +656,9 @@ func _full_feed_layout() -> bool:
 	root.size = Vector2i(1024, 768)
 	await process_frame
 	await process_frame
-	var board := session.get_node(HUD_PATH + "MainArea/BoardArea") as Control
+	var board := session.get_node(HUD_PATH + "MainArea/LeftColumn/BoardArea") as Control
 	var chat := session.get_node(HUD_PATH + "MainArea/SideColumn/ChatSlot") as Control
-	var choice := session.get_node(HUD_PATH + "ChoiceArea") as Control
+	var choice := session.get_node(HUD_PATH + "MainArea/LeftColumn/ChoiceArea") as Control
 	var hud := session.get_node("PrototypeHUD") as PrototypeHUD
 	var history := chat.get_node("ChatContent/ChatHistory") as RichTextLabel
 	var before := board.get_global_rect()
@@ -674,7 +676,7 @@ func _full_feed_layout() -> bool:
 		and is_equal_approx(scrollbar.value, scrollbar.max_value - scrollbar.page)
 		and root.min_size == Vector2i(1024, 768) and before.size.x >= 480 and before.size.y >= 360
 		and before.end.x <= chat.get_global_rect().position.x
-		and chat.get_global_rect().end.y <= choice.get_global_rect().position.y
+		and not chat.get_global_rect().intersects(choice.get_global_rect())
 	)
 	if not layout_ok:
 		return false
@@ -694,3 +696,79 @@ func _full_feed_layout() -> bool:
 		and _webcam(session).get_emotion() == &"happy"
 		and history.text.ends_with(long_line.text)
 	)
+
+
+func _populated_hud_layout() -> bool:
+	var session := await _session()
+	if session == null:
+		return false
+	var hud := session.get_node("PrototypeHUD") as PrototypeHUD
+	var left := session.get_node(HUD_PATH + "MainArea/LeftColumn")
+	var right := session.get_node(HUD_PATH + "MainArea/SideColumn")
+	var board := left.get_node("BoardArea") as Control
+	var choice := left.get_node("ChoiceArea") as Control
+	var controls := left.get_node("Instructions") as Control
+	var chat := right.get_node("ChatSlot") as Control
+	var stats := right.get_node("StatisticsPanel") as Control
+	var explanation := stats.get_node("StatisticsContent/AudienceStrip/Explanation") as Label
+	var notification := stats.get_node("StatisticsContent/DonationStrip/NotificationSlot/Notification") as Label
+	var content := choice.get_node("MessageContent")
+	var long_text := "Длинный текст для проверки переноса внутри отведённой области."
+	var options: Array[Content.ChoiceOption] = []
+	for index in range(3):
+		options.append(Content.ChoiceOption.new(
+			StringName(str(index)), long_text.repeat(2), "Ответ", &"happy", Vector3.ZERO, [],
+		))
+	var definition := Content.ChoiceDefinition.new(
+		1, &"layout", &"question", long_text.repeat(2), "Зритель", options, 6000, 0, 0,
+	)
+	var regions: Array[Control] = [board, choice, controls, chat, stats]
+	for dimensions in [Vector2i(1024, 768), Vector2i(1280, 900)]:
+		hud.set_audience(null, "")
+		hud.clear_donation_notifications()
+		hud.clear_question()
+		root.size = dimensions
+		await process_frame
+		await process_frame
+		var baseline: Array[Rect2] = []
+		for region in regions:
+			baseline.append(region.get_global_rect())
+		hud.set_audience(Audience.new().get_snapshot(), long_text.repeat(2))
+		hud.enqueue_donation(Content.DonationRecord.new(1, 0, 0, 10, "Зритель", long_text))
+		hud.show_question(definition)
+		hud.set_question_time(6.0)
+		await process_frame
+		await process_frame
+		for index in range(regions.size()):
+			if regions[index].get_global_rect() != baseline[index]:
+				printerr("HUD region changed with content at ", dimensions, ": ", regions[index].name)
+				return false
+		var field := baseline[0]
+		var choice_rect := baseline[1]
+		var instructions := baseline[2]
+		var chat_rect := baseline[3]
+		var stats_rect := baseline[4]
+		var viewport := root.get_visible_rect()
+		for rect in baseline:
+			if not viewport.encloses(rect):
+				printerr("HUD region lies outside the viewport at ", dimensions, ": ", rect)
+				return false
+		if not (
+			field.size.x >= 480 and field.size.y >= 400
+			and absf(field.end.y - chat_rect.end.y) <= 1.0
+			and field.end.y <= choice_rect.position.y
+			and choice_rect.end.y <= instructions.position.y
+			and absf(field.get_center().x - instructions.get_center().x) <= 1.0
+			and chat_rect.has_area() and choice_rect.end.x <= chat_rect.position.x
+			and stats_rect.position.y >= chat_rect.end.y
+			and stats_rect.position.x == chat_rect.position.x and stats_rect.end.x == chat_rect.end.x
+			and explanation.text == long_text.repeat(2) and explanation.get_visible_line_count() >= 2
+			and notification.text.contains("Зритель") and notification.get_visible_line_count() == 2
+		):
+			return false
+		for label_path in ["PromptLabel", "Options/Option1Label", "Options/Option2Label", "Options/Option3Label"]:
+			var label := content.get_node(label_path) as Label
+			if label.get_visible_line_count() != 2 or not choice_rect.encloses(label.get_global_rect()):
+				printerr("Long choice text did not fit at ", dimensions, ": ", label_path)
+				return false
+	return true

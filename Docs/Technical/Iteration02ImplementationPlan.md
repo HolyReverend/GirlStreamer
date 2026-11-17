@@ -1,5 +1,7 @@
 # Iteration 02 Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 > **For agentic workers:** Use the project's `stage-orchestrator` skill for whole-iteration execution and `executing-plans` for task-by-task implementation. Delegate only suitable bounded work under AGENTS.md; retain one owner of shared session/UI files and the live editor. This document authorizes no automatic commits or pushes.
 
 **Goal:** Deliver one complete playable stream with a placeholder webcam, contextual chat, questions, donations, reactions and observable audience consequences.
@@ -183,7 +185,7 @@ Proposed sampler: on the 10-second active-time grid, sample at most the latest d
 - [x] Extend closing with a webcam goodbye, finish cue and a scrollable frozen summary.
 - [x] Add three original cues and process-local mute. Pause stops active effects and resume does not replay them.
 - [x] Load touched scenes and audio in Godot 4.7.2 and pass the integration and Stage 1–6 owning runners.
-- [ ] Manually play full six-minute gameplay-focused and communication-focused sessions with matching initial settings/seeds. Record reading/steering comfort, perceived causes of viewer changes, donation behavior and recovery after mistakes. Add one short repeated-loss abuse scenario.
+- [ ] Manually play full three-minute gameplay-focused and communication-focused sessions with matching initial settings/seeds. Record reading/steering comfort, perceived causes of viewer changes, donation behavior and recovery after mistakes. Add one short repeated-loss abuse scenario.
 - [ ] Verify start, pause, resizing at the supported minimum, ending, restart and mute in a standalone run. Packaging/export is not a separate deliverable of this iteration.
 - [x] Record technical evidence and open play checks. Update the architecture to actual ownership.
 

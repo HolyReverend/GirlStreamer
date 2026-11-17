@@ -1,5 +1,7 @@
 # Stage 2: Contextual Chat and Automatic Webcam — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Plan date: 2026-11-12. Implemented and headless-verified on 2026-11-13.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. Keep one writer for session/HUD integration and one owner of the live editor. No automatic commits or pushes.

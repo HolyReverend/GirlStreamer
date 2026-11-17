@@ -40,6 +40,8 @@ func _run() -> void:
 		_collect_and_move,
 		_complete_board,
 		_reset_after_collection,
+		_food_adds_base_speed_until_retry,
+		_food_changes_next_step_in_same_update,
 		_finish_controller_once,
 	]
 	for check in checks:
@@ -145,6 +147,74 @@ func _reset_after_collection() -> bool:
 		):
 			return false
 	return true
+
+
+func _food_adds_base_speed_until_retry() -> bool:
+	var game := SNAKE_GAME.instantiate() as SnakeGame
+	game.columns = 64
+	game.use_fixed_seed = true
+	root.add_child(game)
+	game.set_physics_process(false)
+	game.set_action_authorizer(_allow_action)
+	var state := Fixture.new()
+	game.set("_state", state)
+	game.start()
+	# A live export edit must not change the active attempt's base interval.
+	game.tick_interval_seconds = 0.25
+	var expected_ticks := {0: 0.20, 1: 0.1818181818, 2: 0.1666666667, 10: 0.10, 31: 0.0487804878}
+	var valid := true
+	for count in range(32):
+		if expected_ticks.has(count):
+			valid = valid and is_equal_approx(game.get("_active_tick_seconds"), expected_ticks[count])
+		if count < 31:
+			state.place_food(state.get_body_cells()[0] + Vector2i.RIGHT)
+			game._physics_process(game.get("_active_tick_seconds"))
+			valid = valid and state.get_score() == count + 1
+	# The next step hits the wall. Retry captures the edited base and clears the score.
+	game._physics_process(1.0)
+	var retried := game.restart_attempt()
+	valid = valid and retried and state.get_score() == 0
+	valid = valid and is_equal_approx(game.get("_active_tick_seconds"), 0.25)
+	game.free()
+	return valid
+
+
+func _food_changes_next_step_in_same_update() -> bool:
+	var game := SNAKE_GAME.instantiate() as SnakeGame
+	game.use_fixed_seed = true
+	root.add_child(game)
+	game.set_physics_process(false)
+	var gameplay_gate := {"open": true}
+	game.set_action_authorizer(func() -> bool: return gameplay_gate.open)
+	var state := Fixture.new()
+	game.set("_state", state)
+	game.start()
+	state.place_food(Vector2i(13, 9))
+	game.score_changed.connect(func(_score: int) -> void:
+		state.place_food(Vector2i.ZERO)
+	)
+
+	# The first step costs .20 seconds, the second ~.181818 seconds.
+	game._physics_process(0.39)
+	var valid := (
+		state.get_body_cells()[0] == Vector2i(14, 9) and state.get_score() == 1
+		and is_equal_approx(game.get("_accumulator_seconds"), 0.0081818182)
+	)
+	gameplay_gate.open = false
+	game._physics_process(1.0)
+	valid = valid and state.get_body_cells()[0] == Vector2i(14, 9)
+	valid = valid and is_equal_approx(game.get("_accumulator_seconds"), 0.0081818182)
+	gameplay_gate.open = true
+	game._physics_process(0.17)
+	valid = valid and state.get_body_cells()[0] == Vector2i(14, 9)
+	game._physics_process(0.004)
+	valid = valid and state.get_body_cells()[0] == Vector2i(15, 9)
+	valid = valid and is_equal_approx(game.get("_active_tick_seconds"), 0.1818181818)
+	game.start()
+	valid = valid and state.get_score() == 0 and game.get("_accumulator_seconds") == 0.0
+	valid = valid and is_equal_approx(game.get("_active_tick_seconds"), 0.20)
+	game.free()
+	return valid
 
 
 func _finish_controller_once() -> bool:

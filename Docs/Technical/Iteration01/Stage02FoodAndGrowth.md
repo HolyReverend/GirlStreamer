@@ -1,5 +1,7 @@
 # Stage 2: Food Collection and Growth — Detailed Implementation Plan
 
+> **Current corrections (2026-11-17):** [Iterations 1–2 correction plan](../Iteration01And02Corrections.md) supersedes this document where duration, interaction cadence, Snake speed or HUD placement conflicts. Apply its 180-second preset to future acceptance runs. See the correction plan for current implementation and acceptance status.
+
 Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Goal:** Extend the movement prototype with one collectible food item, immediate body growth and a visible attempt score.

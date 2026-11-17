@@ -72,24 +72,31 @@ func _donation(id: int) -> Content.ChoiceDefinition:
 
 
 func _test_timing() -> void:
+	for outcome in [&"answered", &"expired"]:
+		_setup()
+		_director.first_delay_seconds = 1.0
+		_director.gap_seconds = 1.0
+		_director.tick(19999, true)
+		_check(_requests.is_empty(), "First delay is snapshotted")
+		_director.tick(20000, true)
+		_resolve(99, 21000)
+		_director.tick(39999, true)
+		_check(_opened.size() == 1, "First opening at equality and no overlap")
+		_resolve(1, 21000 if outcome == &"answered" else 26000, outcome)
+		_director.tick(39999, true)
+		_check(_opened.size() == 1, "Opening gap is snapshotted")
+		_director.tick(40000, true)
+		_check(_opened.size() == 2, "Resolution time does not move the opening deadline")
 	_setup()
-	_director.first_delay_seconds = 1.0
-	_director.gap_seconds = 1.0
-	_director.tick(29999, true)
-	_check(_requests.is_empty(), "First delay is snapshotted")
-	_director.tick(30000, true)
-	_director.tick(31000, true)
-	_check(_opened.size() == 1, "First opening at equality and no overlap")
-	_resolve(99, 31000)
-	_director.tick(32000, true)
-	_check(_opened.size() == 1, "Wrong resolution ID does not release the choice")
-	_event(1, Event.Kind.RECORD, 33000)
-	_resolve(1, 36000, &"expired")
-	_resolve(1, 50000)
-	_director.tick(60999, true)
-	_check(_opened.size() == 1, "Resolution gap is snapshotted")
-	_director.tick(61000, true)
-	_check(_opened.size() == 2 and _opened.back().kind == &"question", "Duplicate resolution ignored and old reaction expires")
+	_director.tick(20000, true)
+	_resolve(1, 21000)
+	_director.tick(40000, false)
+	_director.tick(47000, true)
+	_resolve(2, 48000)
+	_director.tick(66999, true)
+	_check(_opened.size() == 2, "Delayed opening anchors its own gap")
+	_director.tick(67000, true)
+	_check(_opened.size() == 3, "No missed openings are replayed")
 
 
 func _test_donation_during_question() -> void:
@@ -101,19 +108,19 @@ func _test_donation_during_question() -> void:
 	_director.tick(32000, true)
 	_check(_opened.size() == 1, "Donation does not replace an open question")
 	_resolve(1, 36000, &"expired")
-	_director.tick(60999, true)
+	_director.tick(49999, true)
 	_check(_opened.size() == 1, "Donation respects the shared gap")
 	viewers[0] = 80
-	_director.tick(61000, true)
+	_director.tick(50000, true)
 	_check(_opened.size() == 2 and _opened.back().kind == &"donation_question", "Donation survives question and gap")
 	_check(_opened.back().window_msec == 5500 and _opened.back().donation_amount == 5, "Donor window samples latest audience and keeps amount")
 	_setup()
 	_director.tick(30000, true)
 	_resolve(1, 33000)
-	_event(1, Event.Kind.RECORD, 54000, 6)
-	_director.tick(57999, true)
+	_event(1, Event.Kind.RECORD, 49000, 6)
+	_director.tick(49999, true)
 	_check(_opened.size() == 1, "Fresh reaction waits for the shared gap")
-	_director.tick(58000, true)
+	_director.tick(50000, true)
 	_check(_opened.size() == 2 and _opened.back().kind == &"reaction", "Fresh reaction opens at the shared boundary")
 
 
