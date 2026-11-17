@@ -51,3 +51,11 @@ docs: уточнить правила работы фонаря
 - Keep source assets, scenes, resources, scripts and their Godot UID/import metadata under version control.
 - Exclude the generated `.godot/` cache; the engine project's `.gitignore` already defines this rule.
 - Do not introduce Git LFS filters unless LFS setup is part of the authorized task.
+
+## Reports during commits
+
+- Before an authorized commit, read only relevant unmarked reports in `Reports/Project/`, `Reports/Doc/` and `Reports/Codex/` to make the message more accurate. This is the exception to the normal write-only rule. Never consult `_commited.md` files.
+- Verify report claims against the staged diff; reports may be stale or describe changes outside this commit. Git history remains authoritative. Missing reports do not require reading archived ones.
+- Track the exact reports used. After the commit succeeds, rename each used report by adding the exact suffix `_commited` before `.md`. Do not mark reports after a failed commit or merely after staging; never rename unused reports. These local renames do not require another commit.
+- If a report covers several changes, use it only when all its changes are included or already committed; otherwise use the staged diff and leave the report unmarked for the remaining work.
+- Never stage or force-add reports. They are ignored local notes, not repository history.

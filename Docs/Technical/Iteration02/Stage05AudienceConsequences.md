@@ -186,21 +186,6 @@ Run deterministic six-minute scenarios from identical initial state using valid 
 
 Record initial/final/peak counts, final impressions, rewarded milestones/records, accepted reaction styles and suppressed positive loss effects. Require replay determinism, bounds, duplicate protection and no unlimited reward from repeated failure. Compare trajectories and explain differences; do not assert both play styles are balanced simply because all tests pass. The no-action organic-growth baseline must be visible in the comparison. If one style is consistently dominated, record the evidence and tune provisional coefficients with a focused rerun rather than silently declaring balance.
 
-During implementation create a concise `Docs/Technical/Iteration02/Stage05AudienceEvaluation.md` with actual scenario settings/results and manual checks, not fabricated results in this plan. Manually verify that a player can explain an impression change, see later count changes, distinguish group preferences, and read the display while steering at minimum window size. Full combined stream/donation balance remains Stage 7.
+During implementation create a concise `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` with actual scenario settings/results and manual checks, not fabricated results in this plan. Manually verify that a player can explain an impression change, see later count changes, distinguish group preferences, and read the display while steering at minimum window size. Full combined stream/donation balance remains Stage 7.
 
-## 12. Execution record
-
-- [x] Audience model, fixed-step clock and source deduplication implemented and checked.
-- [x] Base events, authored answers and reactions change audience independently and exactly once.
-- [x] Record, loss and style-repeat protections verified.
-- [x] HUD explanations, final snapshots and sampled timing dependencies checked.
-- [x] Deterministic comparisons recorded in [Stage05AudienceEvaluation.md](Stage05AudienceEvaluation.md).
-- [x] Architecture and roadmap updated.
-
-The baseline included accepted Stage 1–4 changes in the working tree. The primary owned session routing and integration checks. Bounded workers owned the numerical model/scenarios and HUD/timing. The side column was widened to 320 px to accommodate the group labels. Existing non-default ordinary question windows are snapshotted as Inspector overrides. Usage totals are unavailable.
-
-Godot 4.7.2 passed the audience runner (5 groups), director (43 checks), choices (15 groups), feedback (16 groups), lifetime (8 groups) and timed session (5 groups). The audience runner intentionally exercises non-finite effect and invalid style diagnostics. The lifetime runner retains its intentional invalid-configuration diagnostics. Startup scene smoke passed. Logs use the `stage5-final-` prefix in the local `.godot` directory. Isolated import generated both script UIDs and reported sandbox restrictions on saving editor and user data.
-
-Windowed results and remaining play checks are recorded in the [evaluation](Stage05AudienceEvaluation.md).
-
-The user subsequently verified Stage 5 and confirmed it works correctly.
+Current combined balance/readability follow-up: [OI-003](../../OpenItems/Items/OI-003-StreamPlaytest.md). Retain the verification protocol here; track unresolved findings in that card.

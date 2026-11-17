@@ -37,7 +37,7 @@ Runtime paths are relative to `GirlStreamer/`.
 | `project.godot` | Add `stream_mute` on physical M, without changing current steering/answer/pause/start actions |
 | `tests/iteration02/test_stream_integration.gd` (new) | Combined finish/reset/paused-boundary/summary/audio-trigger checks |
 | Relevant Stage 1–6 owning tests | Update only for intended interface changes and discovered regressions |
-| `Docs/Technical/Iteration02/PlaytestResults.md` (create during execution) | Actual settings, checks, manual findings, remaining issues and acceptance status |
+| a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` (create during execution) | Actual settings, checks, manual findings, remaining issues and acceptance status |
 | `Docs/Technical/Architecture.md`, `Iteration02ImplementationPlan.md` | Actual final ownership/status and evidence links after execution |
 
 Do not create a report filled with invented results during this planning task. Preserve previous stage evidence and note which implementation/configuration the final checks cover.
@@ -133,7 +133,7 @@ For final acceptance run the existing Stage 1–6 owning runners once on the sta
 
 ## 8. Manual playtest protocol
 
-Create `PlaytestResults.md` only when actual evaluation starts. Record engine version, tested source revision or exact changed-file state, settings/content version, seeds, window size, input method, tester and date. Do not require a new commit merely to identify the candidate. Record whether the run used normal or shortened settings and whether any events were forced.
+Create a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` only when actual evaluation starts. Record engine version, tested source revision or exact changed-file state, settings/content version, seeds, window size, input method, tester and date. Do not require a new commit merely to identify the candidate. Record whether the run used normal or shortened settings and whether any events were forced.
 
 1. **First-use check:** start from a fresh process, read Russian controls, start the stream without developer instructions, identify game/webcam/chat/choice regions, use pause and mute, then find the restart action. If the tester already knows the game, record that limitation rather than claiming a new-player study.
 2. **Gameplay-focused full run:** six minutes at normal settings, prioritize Snake progress but interact when practical. Record mistakes, answered/missed questions, chosen reactions, audience trajectory, donations and observed causes.
@@ -147,12 +147,12 @@ Do not impose a retroactive success-rate threshold or claim statistical balance 
 
 ## 9. Evidence and acceptance report
 
-Keep `PlaytestResults.md` concise, with these sections:
+Keep a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` concise, with these sections:
 
 - Candidate/settings and prerequisites: stage statuses and known limitations, exact normal overrides, independent seeds.
 - Automated checks: command, PASS/Fail/NotRun, evidence path and pertinent diagnostics; no redundant log dump.
 - Manual run table: intent, duration, results, tester observations and forced-event disclosure. Separate observed sound/UI from headless checks.
-- Findings: reproducible problem, affected rule, severity, fix/tuning decision and relevant recheck. Separate technical bugs, unchosen product requirements and balance hypotheses.
+- Findings: created or updated OpenItems IDs for unresolved problems/decisions, plus completed fixes and relevant rechecks. Separate technical bugs, unchosen product requirements and balance hypotheses.
 - Acceptance: each of the seven scope criteria mapped to evidence and Pass/Fail/NotRun; user acceptance separately recorded with actual date/statement if supplied.
 - Remaining work: genuine limitations and deferred scope, without calling missing mandatory checks “optional polish.”
 
@@ -165,20 +165,6 @@ Do not mark the iteration accepted solely from automated success. If no human pl
 - [ ] **C — Add local audio/mute.** Create three small original cues and one scene-owned audio component; wire only accepted event paths, M toggle and pause/skip/teardown behavior.
 - [ ] **D — Run final technical gate.** Execute integration and stable-candidate owning checks, load touched scenes/assets and fix failures at their owners. Record actual evidence, not assumed pass status.
 - [ ] **E — Run manual protocol.** Perform the paired full sessions, short abuse check and standalone/audio/lifecycle check. Record limitations; tune only evidence-backed provisional settings and recheck affected behavior.
-- [ ] **F — Close documentation and handoff.** Update Architecture and roadmap to actual implemented state, link PlaytestResults, list all changed files and distinguish technical completion from user/experiential acceptance. No commit/push/export unless separately authorized.
+- [ ] **F — Close documentation and handoff.** Update Architecture and roadmap to actual implemented state, record current acceptance status in the plan and write a local work report, list all changed files and distinguish technical completion from user/experiential acceptance. No commit/push/export unless separately authorized.
 
-## 11. Execution record
-
-- [x] Single finish transaction and copied summary verified.
-- [x] Three cues loaded and mute routing verified. Listening remains NotRun.
-- [x] Technical tests and partial standalone evidence recorded in [PlaytestResults.md](PlaytestResults.md).
-- [x] Architecture and roadmap updated.
-- [ ] Complete hands-on audio, larger-window and full paired play checks.
-
-The baseline included accepted Stages 1–6 in the working tree. The primary owned session integration and final verification. Bounded workers owned result/HUD presentation and audio/integration fixtures. A separate desktop worker observed standalone presentation, and a separate reviewer checked the implementation. Usage totals are unavailable.
-
-Godot 4.7.2 passed the integration suite (4 groups), donations (6), director (44 checks), audience (5), choices (15), feedback (16), lifetime (8) and timed session (5). The baseline RED reported the missing scene-owned StreamAudio. Audience and lifetime intentionally emit negative-case diagnostics. Startup smoke passed. Log prefix: `stage7-final-` under the local `.godot` directory. Isolated editor import generated the WAV metadata and script UIDs and reported restrictions on saving editor preferences and user data.
-
-The WAVs are original 24 kHz mono PCM16 cues. They use sine notes with a low second harmonic and cosine fades, lasting 0.15, 0.30 and 0.50 seconds. Source WAVs load directly for standalone runs with no import cache. Playback routing and duration were checked through Godot, with no listening claim.
-
-Runtime changes are in the session script/scene, StreamResults, StreamAudio, the three WAVs, HUD script/scene, webcam script and Input Map. Tests add the final integration runner and migrate existing choice, feedback and timed-session result assertions. Godot metadata accompanies new scripts and sounds.
+Current acceptance gaps: [audio](../../OpenItems/Items/OI-001-AudioAcceptance.md), [window/input](../../OpenItems/Items/OI-002-WindowAcceptance.md), [human playtest and tuning](../../OpenItems/Items/OI-003-StreamPlaytest.md). The protocols below define how to check them; maintain pending findings in the cards, not only in reports.

@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: implemented and technically verified; manual playtest 
 
 **Specification:** [Iteration roadmap](../Iteration01ImplementationPlan.md), Stage 5 and iteration evaluation; [Stage 4](Stage04TimedSession.md); [Streaming gameplay](../../GameDesign/Mechanics/StreamingGameplay.md), simultaneous play and single-choice constraints; [Minigames](../../GameDesign/Mechanics/Minigames.md), chat compatibility. The user's deliberately simplified question experiment takes precedence over the complete streaming design.
 
-Stage 5 extends the accepted Stage 1–4 implementation. The execution record below separates technical evidence from human playtest observations.
+Stage 5 extends the accepted Stage 1–4 implementation.
 
 ## 1. Scope and initial settings
 
@@ -207,7 +207,7 @@ After functional checks pass, run one six-minute baseline with messages disabled
 
 Record settings, run order, food/attempt/collision results, question counts, mean response time and answer rate with its sample count. Individual times remain available in the session's in-memory array; inspect/copy them only if needed to explain observations. Ask the player to note readability, ability to find keys while steering, interruption/frustration and whether mistakes felt recoverable. The prompts require choosing a preference, not blindly pressing any digit to maximize rate. Record fewer opportunities caused by long retry waits as a limitation rather than evidence that answering during play is easy.
 
-Write observations after play in `Docs/Technical/Iteration01/PlaytestResults.md` (future evaluation artifact, not created by this planning task). Keep the record concise; no runtime export or storage system is required. If manual play is unavailable, mark it NotRun and leave experiential acceptance open.
+Write observations after play in a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` (future evaluation artifact, not created by this planning task). Keep the record concise; no runtime export or storage system is required. If manual play is unavailable, mark it NotRun and leave experiential acceptance open.
 
 There is no predeclared pass-rate threshold or statistical claim from two runs. A difficult result is valid evidence: adjust one of window, gap, wording or Snake speed at a time and repeat only the relevant comparison. Stage-based Snake remains a potential next-iteration decision, not an automatic scope expansion here.
 
@@ -220,25 +220,4 @@ There is no predeclared pass-rate threshold or statistical claim from two runs. 
 
 Report actual changed files, performed checks and remaining decisions. Completing the functional prototype does not validate the full streaming system, final balance or comfort without the playtest evidence.
 
-## 10. Execution record
-
-Baseline: `34dfe69`, with Stage 4 and earlier acceptance documentation already in the working tree. This task records Stage 4 acceptance from the user's manual report. Verified with Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility.
-
-| Changed files | Result |
-| --- | --- |
-| [quick_messages.gd](../../../GirlStreamer/prototype/messages/quick_messages.gd) and its UID | Three Russian questions, integer-millisecond scheduling, physical number-key input, resolution and feedback. |
-| [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd), [prototype_session.tscn](../../../GirlStreamer/prototype/prototype_session.tscn) | Session-owned controller, one clock sample, configuration, metrics and cancellation before the final snapshot. |
-| [prototype_hud.gd](../../../GirlStreamer/prototype/ui/prototype_hud.gd), [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [project.godot](../../../GirlStreamer/project.godot) | Fixed question region, metrics in results and physical top-row bindings. |
-| [test_quick_messages.gd](../../../GirlStreamer/tests/iteration01/test_quick_messages.gd) and its UID, [test_timed_session.gd](../../../GirlStreamer/tests/iteration01/test_timed_session.gd) | Five question test groups and an explicitly disabled baseline for the timer-only fixtures. |
-| [Stage 4 plan](Stage04TimedSession.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Acceptance, evidence and runtime ownership. |
-
-Local logs and temporary probes are under `GirlStreamer/.godot/`. Godot commands used `--path GirlStreamer`.
-
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Baseline and intentional wrong expectation | Expected failures | Exit 1 for the missing controller and for an incorrect expected answer rate, with no unexpected engine errors. See `stage05-messages-red.log` and `stage05-messages-negative.log`. |
-| Quick messages and timed session runners | Pass | Both exited 0. `STAGE05_MESSAGES_PASS groups=5` and `STAGE04_SESSION_PASS groups=5`. See `stage05-quick_messages.log` and `stage05-timed_session.log`. |
-| Editor import and normal scene startup | Pass | `--headless --import` and `--headless --quit-after 120` exited 0 with no engine/script errors. See `stage05-import-console.log` and `stage05-smoke.log`. |
-| Short graphical scenario | Pass | The standalone main scene used a controlled clock and actual viewport input. It accepted 1, 2 and 3 during Snake movement, expired two choices, preserved the open deadline across a retry, and cancelled one choice at session expiry. Enter reset the metrics and started the disabled baseline. Board geometry matched across question, feedback and disabled states at fixed viewport size, and the board resized at 1160×800. Captures at 1024×768 show the prompt and results outside the board. See `stage05-graphical.log`, `stage05-question.png` and `stage05-results.png`. |
-| Short interactive editor play | NotRun | The scripted graphical scenario exercised the shortened settings. Manual steering/answer comfort and the editor debugger were not observed. The 360/45/45/5 defaults remain configured; shortened settings were local to the probe instance. |
-| Paired six-minute human playtest | NotRun | Experiential acceptance remains open. Record a baseline and an enabled run with the same fixed seed and settings in `PlaytestResults.md` after play. No synthetic measurements are substituted for human observations. |
+The remaining comfort evaluation is carried forward into [OI-003](../../OpenItems/Items/OI-003-StreamPlaytest.md) for the current combined stream; this historical plan does not require a duplicate playtest of the replaced controller.

@@ -178,19 +178,3 @@ New success marker: `ITER02_STAGE06_DONATIONS_PASS`; failures identify the case 
 If shared choice/feed APIs change, run their owning Stage 3/2 checks as well. Do not repeat pure Snake tests without a relevant change/failure. Load affected scenes through installed-engine validation.
 
 Manual scenario uses deterministic fixture/seed to guarantee one message donation and at least two opened donor questions, without adding a permanent debug menu: answer one question, let the other expire, and provide an additional receipt while a choice is open to exercise waiting. Pause, retry, finish and restart. Inspect notification/choice readability and confirm totals match committed records. Forced successes prove behavior, not natural income balance. Record fixture settings and actual checks in this stage's execution notes; full natural six-minute balance is Stage 7.
-
-## 11. Execution record
-
-- [x] Donation sampler, independent RNG and one-time credit verified.
-- [x] Donor questions share existing priority, cap, deadline and audience rules.
-- [x] Notification overflow and chat retention are independent from accounting.
-- [x] Pause, retry, cutoff and restart verified with scripted donations.
-- [x] Architecture and roadmap updated.
-
-The working tree already contained accepted Stages 1–5. Bounded workers owned the sampler/content and HUD/director/feed changes. The primary owned stream integration and combined tests. The sampler rotates authored messages, questions and nicknames independently of its private draws. Earlier audience scenarios and ordinary-choice fixtures disable donations locally to retain their original test scope.
-
-Godot 4.7.2 passed the donation suite (6 groups), director (44 checks), audience (5 groups), choices (15 groups), feedback (16 groups), lifetime (8 groups) and startup smoke. The donation runner checks both orders of a same-time collision and paid receipt during an open ordinary question, plus expiration effects before payment sampling. Audience and lifetime emitted only their documented negative-test diagnostics. Logs are in the local `.godot` directory with prefix `stage6-final-`. Isolated import generated script UIDs and reported sandbox restrictions on editor preferences.
-
-Headless geometry at 1024 × 768 confirmed the fixed board and choice regions with long notification text and overflow. A separate forced 1024 × 768 windowed run committed four receipts (2, 5, 10, 25 coins), opened two donor questions and let both expire. A receipt arrived while the first question was open. The rendered summary showed four receipts and 42 coins, matching the controller. Rendered inspection of an open donor question and answering by physical keyboard remain open. Pause, retry, cutoff, restart and answered/expired/cancelled donor effects were verified through the focused engine runner. The windowed fixture was removed.
-
-The user subsequently tested Stage 6 and confirmed it works correctly.

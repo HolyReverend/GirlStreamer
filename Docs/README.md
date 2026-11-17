@@ -27,3 +27,7 @@ Technical documentation is written in English.
 ## Tasks spanning both areas
 
 Read both areas only when the task depends on both gameplay intent and technical details. For example, implementing a mechanic requires its specific design document and the relevant technical documents. A technical task does not require unrelated game design documents.
+
+## Open questions and proposals
+
+[OpenItems/Index.md](OpenItems/Index.md) routes unresolved decisions, proposals and validation gaps. For routine work, select only rows for the affected area; open only relevant cards. Review the short index at stage/iteration planning and before stage completion. Follow [the workflow](../Codex/Workflow.md#open-questions-and-proposals) for triggers, updates and closure. Do not preload the Items folder or consult work reports to recover pending work.

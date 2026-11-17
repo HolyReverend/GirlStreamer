@@ -8,7 +8,7 @@
 
 **Tech Stack:** Existing Godot 4.7 Standard / GDScript, GL Compatibility, geometric placeholder graphics and local authored text.
 
-**Spec:** [Iteration 02 scope](../GameDesign/Iteration02Scope.md). Scope is user-approved; numeric defaults and scheduling details are proposed first-pass tuning, not approved final balance. Stages 1–6 are accepted and Stage 7 is implemented. See [acceptance evidence](Iteration02/PlaytestResults.md) for final verification and open manual checks. Date: 2026-11-12.
+**Spec:** [Iteration 02 scope](../GameDesign/Iteration02Scope.md). Scope is user-approved; numeric defaults and scheduling details are proposed first-pass tuning, not approved final balance. Stages 1–6 are accepted and Stage 7 is implemented. Final acceptance remains open: [audio](../OpenItems/Items/OI-001-AudioAcceptance.md), [window/input checks](../OpenItems/Items/OI-002-WindowAcceptance.md), and [human playtest/tuning](../OpenItems/Items/OI-003-StreamPlaytest.md). Date: 2026-11-12.
 
 ## Global constraints
 
@@ -25,7 +25,7 @@
 
 `prototype_session.gd` currently owns READY/RUNNING/FINISHED, starts automatically after initial layout, samples monotonic milliseconds, and wires Snake, QuickMessages and HUD. QuickMessages currently combines placeholder content, scheduling, deadlines, input and feedback. Its replacement must remove that old scheduler rather than run two input owners.
 
-Stage 5 of iteration 01 records technical verification but leaves the paired six-minute human playtest NotRun. The user's completion statement is respected; missing recorded comfort evidence must not be treated as proof that denser interactions are comfortable. Iteration 02's final playtest covers the new combined experience.
+Stage 5 of iteration 01 records technical verification but leaves the paired six-minute human playtest NotRun. The user's completion statement is respected; missing recorded comfort evidence must not be treated as proof that denser interactions are comfortable. Iteration 02's final playtest covers the new combined experience; the remaining work is tracked in [OI-003](../OpenItems/Items/OI-003-StreamPlaytest.md).
 
 `Architecture.md` describes existing implementation; update it after implementation stages, not now to portray this plan as delivered.
 
@@ -153,7 +153,7 @@ Proposed initial numerical model, isolated for tuning:
 - [x] Verify deterministic steps, bounded state, effect identity and loss/style repeat limits.
 - [x] Route effects through the session and expose copied audience snapshots.
 - [x] Show current/peak viewers, group impressions and measured causes. Retain the newest 20 causes.
-- [x] Record the fixed-seed scenarios and provisional tuning observations in the [audience evaluation](Iteration02/Stage05AudienceEvaluation.md).
+- [x] Record the fixed-seed scenarios and provisional tuning observations in the local work reports (write-only; see Codex/Workflow.md).
 
 **Deliverable:** choices and play measurably change the audience, with visible reasons and repeat protection.
 
@@ -177,7 +177,7 @@ Proposed sampler: on the 10-second active-time grid, sample at most the latest d
 
 **Detailed plan:** [Stage07CompleteStream.md](Iteration02/Stage07CompleteStream.md).
 
-**Files:** create audio owner/assets and `tests/iteration02/test_stream_integration.gd`; finish session/HUD/webcam; update `Architecture.md`; create `Docs/Technical/Iteration02/PlaytestResults.md` during actual evaluation.
+**Files:** create audio owner/assets and `tests/iteration02/test_stream_integration.gd`; finish session/HUD/webcam; update `Architecture.md`; create a new `Reports/Doc/Report_Doc_YYYY_MM_DD_HH_mm_JobName.md` during actual evaluation.
 
 - [x] Verify crowded finish, frozen results, restart, pause and audio routing in the integration runner.
 - [x] Extend closing with a webcam goodbye, finish cue and a scrollable frozen summary.
@@ -197,4 +197,4 @@ Use the existing engine-native SceneTree runner convention. For each meaningful 
 
 Stages are sequential because later systems consume earlier contracts. A bounded reader/content reviewer can work independently; concurrent edits to session/HUD/content or concurrent editor access cannot. Before each stage, inspect the current owning files rather than assuming this plan is a record of implementation.
 
-See the individual stage records for implementation and verification status. Final coefficient tuning remains subject to the recorded playtest; changes to approved scope require a new user decision.
+See the individual stage plans and Architecture.md for current implementation and acceptance status. Final coefficient tuning remains subject to the recorded playtest; changes to approved scope require a new user decision.

@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Specification:** [Iteration 1 roadmap](../Iteration01ImplementationPlan.md), Stage 3 and shared contracts; [Stage 1](Stage01SnakeMovement.md); [Stage 2](Stage02FoodAndGrowth.md); [Minigames](../../GameDesign/Mechanics/Minigames.md), attempt and Snake rules.
 
-Stage 3 extends the accepted Stage 1–2 implementation. The execution record below records verified behavior and any open editor checks.
+Stage 3 extends the accepted Stage 1–2 implementation.
 
 ## 1. Behavior and scope
 
@@ -193,29 +193,3 @@ This establishes actual key handling and readable feedback; deterministic fixtur
 - [x] Report every changed file, actual checks and remaining `NotRun` items; distinguish planned future session behavior from tested behavior.
 
 Stage 4 extends the parent's retry authorization with session state/deadline checks and keeps its clock/totals outside the attempt reset. Stage 5 keeps any active question and its deadline outside that reset too. Those integrations are future work, not hidden Stage 3 prerequisites.
-
-## 9. Execution record
-
-Baseline: `808d394`, with uncommitted Stage 2 implementation and earlier documentation already present. Stage 2 acceptance now records the user's manual check. Verified on Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility.
-
-| Changed files | Result |
-| --- | --- |
-| [snake_state.gd](../../../GirlStreamer/prototype/snake/snake_state.gd) | Wall and retained-body collision, vacating-tail exception and one terminal reason. |
-| [snake_game.gd](../../../GirlStreamer/prototype/snake/snake_game.gd) | Attempt lifecycle, single terminal event and guarded restart with fresh timing. |
-| [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd), [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [project.godot](../../../GirlStreamer/project.godot) | Parent-routed Space action, reason-specific prompts and updated controls. |
-| [test_snake_collisions.gd](../../../GirlStreamer/tests/iteration01/test_snake_collisions.gd) and its UID | Five model and session check groups. |
-| [test_snake_food.gd](../../../GirlStreamer/tests/iteration01/test_snake_food.gd), [test_snake_movement.gd](../../../GirlStreamer/tests/iteration01/test_snake_movement.gd) | Assert retry eligibility on full board and remove the obsolete boundary-guard case. |
-| [Stage 2 plan](Stage02FoodAndGrowth.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Acceptance, verification evidence, progress and current ownership. |
-
-Local evidence is under the ignored `GirlStreamer/.godot/` directory. The Godot commands used `--path GirlStreamer`.
-
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Old model and intentional wrong expectation | Expected failures | Exit 1 in both cases. The old wall guard failed the terminal-state check; the negative fixture rejected an incorrect collision reason. See `stage03-collisions-red.log` and `stage03-collisions-negative.log`. |
-| Collision, food and movement runners | Pass | Exit 0 in all three, with `STAGE03_COLLISIONS_PASS groups=5`, `STAGE02_FOOD_PASS checks=5` and `STAGE01_MOVEMENT_PASS checks=4`. Logs: `stage03-collisions.log`, `stage03-food.log`, `stage03-movement.log`. |
-| Editor import and startup | Pass | `--headless --import` and `--headless --quit-after 120` returned 0 with no engine or script errors. See `stage03-import-console.log` and `stage03-smoke.log`. |
-| Standalone graphical play | Pass | A fixed-seed probe drove the main scene through viewport key events. It collected food, hit the body and wall, observed each frozen board and retained score, then retried each with Space. Waiting steering, Space echo/release and Space during play did not reset the attempt. See `stage03-graphical.log`, `stage03-self.png` and `stage03-wall.png`. |
-| Retry with invalid settings | Pass | A temporary probe set the grid below its supported minimum before retrying. The controller reported the expected validation error, entered STOPPED and replaced the retry prompt with the settings error. See `stage03-invalid-retry.log`. |
-| Interactive editor wall and retry smoke | Pass | F5 reached a frozen wall collision and showed the Space prompt. Space started a three-cell attempt with food, score zero and a cleared prompt. F8 stopped the game. The editor showed zero runtime errors and warnings after stopping. |
-| Full interactive editor scenario | Partial | Food collection before collision, self-collision and holding Space across a collision were verified by the standalone graphical probe with injected key events. Those parts were not repeated by hand in the editor. |
-| User manual play | Pass | On 2026-11-12 the user confirmed wall and self collisions, a fresh attempt on Space, and no restart when holding the key. This confirmation and the recorded technical checks establish Stage 3 acceptance. |

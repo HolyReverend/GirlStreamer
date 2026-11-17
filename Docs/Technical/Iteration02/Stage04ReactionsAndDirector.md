@@ -1,6 +1,6 @@
 # Stage 4: Reactions and One Interaction Scheduler — Detailed Implementation Plan
 
-Plan date: 2026-11-13. Implemented. See the execution record for verification.
+Plan date: 2026-11-13. Implemented.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. One writer owns session/content integration and one owner controls the editor. No automatic commits or pushes.
 
@@ -178,21 +178,3 @@ Resolve `$godotExe` from actual project configuration. Intended commands from re
 New marker: `ITER02_STAGE04_DIRECTOR_PASS`. Require explicit PASS, zero exit and no unexpected diagnostics; name expected invalid-content/configuration errors separately. Migrate Stage 3 scheduling tests rather than deleting coverage or asserting both old/new schedules. Pure Snake regression suites are unnecessary unless owning rules change or a failure warrants them.
 
 Manual scenario with shortened settings: question active when Snake collides; observe no overlap, then retry; trigger a qualifying event near the end of an idle gap; choose each style across multiple openings; let one reaction expire; pause while a candidate waits; finish with a choice open and restart. Test donation priority only through controlled fixtures, not a new player-facing debug mode. Verify stable 1024 × 768 layout, readable three-second options and uninterrupted movement. Full six-minute balance acceptance remains Stage 7.
-
-## 10. Execution record
-
-- [x] Director is the only scheduler and StreamChoice the only choice input owner.
-- [x] Reactions, record/milestone precedence and per-kind outcomes verified.
-- [x] Bounded pending slots, freshness, priorities, cooldown and common cap tested.
-- [x] Pause/retry/finish/restart and prior-stage boundary guarantees preserved.
-- [x] Architecture and roadmap reflect implementation.
-
-Baseline `e2c63f0` included the accepted Stages 1–3 working-tree changes. The primary owned session/HUD integration, with bounded workers for the director, content, and migrated regressions. Scheduler tuning is exposed on the StreamDirector node; the session keeps the ordinary question window and enable flag. Usage totals are unavailable.
-
-Godot 4.7.2:
-
-- Baseline RED identified the missing director script. Final `ITER02_STAGE04_DIRECTOR_PASS` passed 43 checks, including a synthetic donation candidate surviving an open question and the shared gap.
-- Choice (15), feedback (12), lifetime (8) and timed session (5) passed. The feedback run also covered pause with a pending reaction, cancellation at stream cutoff and frozen totals. Lifetime emitted only its expected invalid-configuration errors. The startup scene loaded cleanly.
-- Logs are under the local `.godot` directory with the `stage4-final-` prefix. Isolated import generated both script UIDs and reported sandbox restrictions on editor preferences and user-data directories.
-- Windowed verification with a deterministic milestone confirmed the reaction heading, event caption and fixed 1–3 style order. The panel was legible and did not overlap the board or chat. An injected Godot key event displayed the selected reply and compatible chat response. Expiration returned the panel to idle without a new reply. Physical keyboard play and the full crowded-event scenario remain open.
-- The user subsequently verified Stage 4 and confirmed it works correctly.

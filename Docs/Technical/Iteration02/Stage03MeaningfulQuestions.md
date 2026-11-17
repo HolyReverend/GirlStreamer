@@ -1,6 +1,6 @@
 # Stage 3: Meaningful Questions and Shared Choice Input — Detailed Implementation Plan
 
-Plan date: 2026-11-13. Implemented and headless-verified. See the execution record for windowed verification.
+Plan date: 2026-11-13. Implemented and headless-verified.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. Keep one writer for shared session/content/HUD files and one owner of the editor. No automatic commits or pushes.
 
@@ -178,22 +178,3 @@ Use existing SceneTree runner conventions. New marker: `ITER02_STAGE03_CHOICES_P
 Require explicit PASS, exit code zero and no unexpected diagnostics. Label expected invalid-content errors separately. Load touched scripts/scenes with the installed engine's supported workflow. Do not run the retired quick-message runner or unrelated pure Snake suites without a relevant change/failure.
 
 Manual scenario: open a contextual question using shortened timing; steer while answering each key across several questions; pause during an open question and a selected reply; collide/retry during a question; observe expiry; finish with an open question; restart and run with questions disabled. Inspect a catalog fixture for all long text cases rather than waiting for twelve prompts in one stream. Full experience/balance acceptance remains Stage 7.
-
-## 11. Execution record
-
-- [x] StreamChoice is the only timed-choice input owner. Removed the legacy runtime and test after migrating coverage.
-- [x] Twelve questions, 36 replies and 72 compatible chat responses implemented.
-- [x] Scheduling, pause/retry, boundary cancellation and copied outcomes verified.
-- [x] Effect vectors are stored as provisional data. Audience and donation execution belongs to later stages.
-- [x] Architecture and roadmap updated.
-
-Baseline `e2c63f0` had accepted Stages 1 and 2 in the working tree. The primary owned session/HUD/webcam integration. Bounded workers owned content/controller/feed and test migration. Questioner nicknames cycle through the authored nickname list by opening ID. Usage totals are unavailable.
-
-Godot 4.7.2 console:
-
-- Baseline RED exited 1 because the startup scene lacked StreamChoice.
-- Final `ITER02_STAGE03_CHOICES_PASS` covered 15 groups, including eligibility for every catalog entry, steering while a choice remains open, answer and expiry while waiting to retry, pausing at the choice deadline and measured font fit at 1024 × 768. The test caught four two-line captions exceeding the original label height by 1 px. The label now reserves 44 px.
-- Lifetime (8), stream feedback (9) and timed session (5) passed. Lifetime emitted only its expected invalid-configuration errors. The startup scene loaded cleanly in the smoke run. Logs are under the local `.godot` directory with the `stage3-final-` prefix.
-- An isolated import generated script UIDs. The sandbox prevented writing the editor's user settings and user-data directory. Runtime checks loaded the touched scenes and scripts successfully.
-- In a windowed fixture with shortened scheduling, the questioner, prompt and all three options were legible. A Godot physical-key event displayed the selected reply, its compatible chat response and the confirmation banner. Pause retained the displayed reply. Desktop key emulation did not register the physical top-row key, so the full manual sequence of steering and answering with all three physical keys remains open.
-- The user subsequently tested Stage 3 and confirmed it works correctly.

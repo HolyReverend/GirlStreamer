@@ -32,13 +32,6 @@ If unavailable, check that the correct project is open and Funplay MCP is enable
 
 The launcher depends on the project user-data name `GirlStreamer`; update it if that name or the user-data location changes. Do not update the vendored addon independently of its wrapper without validation.
 
-## Verified on 2026-11-11
-
-- Godot reports `4.7.2.stable.official.ed1daf0bf` and the plugin loads in the graphical editor without reported errors.
-- `codex mcp get godot_girlstreamer` recognizes the project configuration.
-- A separate MCP test client used the configured stdio launcher: initialization, discovery of 78 tools, and `get_project_info` succeeded.
-- `execute_code` attached and immediately freed a temporary node in the editor tree; the returned editor flag and project path matched. No gameplay scene was saved.
-- The current Codex chat has not reloaded its native tool catalog. Native use after restarting Codex remains to be confirmed.
-- Gameplay launch, runtime bridge, screenshots, and every individual tool were not tested.
-
 References: [upstream](https://github.com/FunplayAI/funplay-godot-mcp), [Codex MCP configuration](https://developers.openai.com/codex/mcp/).
+
+Conditional runtime-access follow-up: [OI-005](../Docs/OpenItems/Items/OI-005-McpRuntime.md); check when a task actually needs live gameplay tools.

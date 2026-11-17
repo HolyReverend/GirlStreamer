@@ -26,12 +26,6 @@ Source: https://github.com/gamedev-skills/awesome-gamedev-agent-skills, commit `
 
 Local adaptations: narrow discovery triggers, common workflow delegated to godot-gamedev, on-demand technical references, conditional verification, corrections to lifecycle/typing/resource examples. Unsafe save/test templates and both bundled executable checkers were omitted. These skills provide guidance, not a runtime integration.
 
-## Validation on 2026-11-11
-
-- Independent static routing review: eight scenarios cover all seven specialist domains and a prose-only negative case; expected selections matched.
-- Metadata, relative Markdown links and UTF-8 files checked; installed bytes match reviewed staging files.
-- Existing godot-gamedev entrypoint hash unchanged.
-- Upstream checker experiments exposed limitations; excluded helpers were not accepted as project validation tools.
-- Godot runtime and native skill auto-discovery were not exercised by this installation. Optional API examples are not claimed as locally runtime-tested.
-
 Installed file inventory and hashes: [GodotSkillsInstallation.json](GodotSkillsInstallation.json).
+
+Discovery follow-up: [OI-004](../Docs/OpenItems/Items/OI-004-SkillDiscovery.md); check only when the relevant skills are needed.

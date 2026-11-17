@@ -202,23 +202,3 @@ Resolve `$godotExe` from the project's actual installed Godot configuration befo
 Require exit code 0, explicit PASS and no unexpected parser/runtime diagnostics. Negative configuration cases intentionally exercise existing validation errors. Also load touched scripts and scenes through the installed engine's supported validation workflow.
 
 Manual scenario: start using Enter; steer and answer; pause with a question; wait and resize; press ignored controls; resume and answer; collide, pause while waiting, resume and retry; finish a shortened test session, skip closing, restart. Check normal 360-second default remains configured. A full paired six-minute balance playtest belongs to Stage 7, not this shell stage.
-
-## 10. Execution record
-
-- [x] Explicit start, pause/resume, expiry, closing and restart implemented.
-- [x] Existing question behavior preserved and active-time latency verified.
-- [x] Minimum-size shell visually checked; Russian captions complete.
-- [x] New focused runner and affected regressions passed with recorded output.
-- [x] User confirmed the remaining windowed cases work correctly.
-- [x] Architecture and roadmap reflect actual changes.
-
-Baseline revision `e2c63f0` had pending iteration 02 plans/scope and a modified documentation index. Execution covered the session, HUD, model input buffer, Input Map and scoped tests listed above. The primary owned session integration and verification, with Sol bounded workers for HUD and tests and a Terra worker for desktop checks. Usage totals are unavailable.
-
-Godot 4.7.2 console, 2026-11-13:
-
-- Baseline RED: readiness check exited 1 because the layout started Snake without Enter.
-- Final headless runs all exited 0 with PASS markers in console output. Lifetime `ITER02_STAGE01_LIFETIME_PASS` (8 groups), timed session (5), messages (5), collisions (5), movement (4) and food (5).
-- The lifetime runner intentionally rejects invalid duration in READY and FINISHED, invalid question timing and an out-of-range Snake grid. These are the only Godot error diagnostics in the suite.
-- Startup scene headless smoke run exited 0. The lifetime runner verified geometry at 1024 × 768 and 1280 × 900 and board stability across idle, question, feedback and pause.
-- A windowed run used temporary settings for a 30-second stream and earlier questions. At the configured minimum size, the areas and Russian text were readable without overlap. Observed Enter start, question and board freeze on Escape, ignored answer during pause, retained retry state across pause, Space retry, automatic closing-to-results and Enter restart. The temporary settings were removed.
-- The user completed the remaining windowed checks and confirmed correct behavior, including steering, answering after resume, skipping closing with Enter and using the larger window.

@@ -10,7 +10,7 @@ Date: 2026-11-12. Status: accepted on 2026-11-12.
 
 **Specification:** [Iteration 1 roadmap](../Iteration01ImplementationPlan.md), Stage 2 and shared contracts; [Stage 1 detailed plan](Stage01SnakeMovement.md); [Minigames](../../GameDesign/Mechanics/Minigames.md), Snake section.
 
-Stage 2 extends the accepted Stage 1 implementation. The execution record below distinguishes automated checks from editor observations.
+Stage 2 extends the accepted Stage 1 implementation.
 
 ## 1. Scope and behavior
 
@@ -184,29 +184,3 @@ Full-board termination is covered by the short deterministic fixture; manually f
 - [x] The implementation report lists changed files, actual validation evidence, `NotRun` checks and remaining prototype limitations.
 
 Stage 3 inherits this score/growth model and completion signal. Its collision decision must occur before mutating body, awarding score or spawning food; it replaces the temporary wall guard and adds self-collision/retry. No Stage 2 record should claim those mechanics or final game balance are already validated.
-
-## 9. Execution record
-
-**Baseline:** `808d394`, clean before the Stage 1 acceptance update. Verified with Godot Standard `4.7.2.stable.official.ed1daf0bf`, GL Compatibility. Stage 1 acceptance was recorded from the user's keyboard check. This stage retains the temporary edge guard and self-overlap behavior for Stage 3 to replace.
-
-| Changed files | Result |
-| --- | --- |
-| [snake_state.gd](../../../GirlStreamer/prototype/snake/snake_state.gd) | Injected RNG, finite free-cell selection, collection, growth, score and completion. |
-| [snake_game.gd](../../../GirlStreamer/prototype/snake/snake_game.gd) | Seed settings, score and completion events, final snapshot and stop before notification. |
-| [snake_board.gd](../../../GirlStreamer/prototype/snake/snake_board.gd) | Orange food marker drawn from the board snapshot. |
-| [prototype_hud.tscn](../../../GirlStreamer/prototype/ui/prototype_hud.tscn), [prototype_hud.gd](../../../GirlStreamer/prototype/ui/prototype_hud.gd), [prototype_session.gd](../../../GirlStreamer/prototype/prototype_session.gd) | Score and completion status above the board, wired through the session. |
-| [test_snake_food.gd](../../../GirlStreamer/tests/iteration01/test_snake_food.gd) and its UID, [test_snake_movement.gd](../../../GirlStreamer/tests/iteration01/test_snake_movement.gd) | Five food/completion checks and five retained movement checks with food off the tested routes. |
-| [Stage 1 plan](Stage01SnakeMovement.md), this plan, [iteration roadmap](../Iteration01ImplementationPlan.md), [architecture map](../Architecture.md) | Acceptance, evidence, progress and current ownership. |
-
-Logs and temporary probes are under the ignored `GirlStreamer/.godot/` directory. Godot commands ran with `--path GirlStreamer`.
-
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Food runner before implementation | Expected failure | Exit 1 and explicit missing-food-state failure, `stage02-food-red.log`. |
-| Food runner with an intentionally incorrect final length | Pass | Ignored fixture copy exited 1 with `STAGE02_FOOD_FAIL _complete_board` and no success marker, `stage02-food-negative.log`. |
-| Food/completion and movement runners | Pass | Both exited 0 with `STAGE02_FOOD_PASS checks=5` and `STAGE01_MOVEMENT_PASS checks=5`. See `stage02-food.log` and `stage02-movement.log`. |
-| Editor import | Pass | `--headless --import` exited 0 without engine or script errors, `stage02-import-console.log`. |
-| Standalone graphical collection | Pass | Ran the main scene with the fixed seed enabled for this probe and injected arrow events through the viewport. Two collections added one point and one segment each. Food and score held over 15 ordinary steps. Cadence remained consistent with the 0.20 s interval. A fresh session restored score zero and length three. `stage02-graphical.log`; `stage02-score2.png` shows a distinct food marker and the score above the board at 1024×768. |
-| Completion status in the main scene | Pass | The final-cell fixture produced a visible status label with the completion text and score 61, `stage02-completion-hud.log`. |
-| Interactive editor collection | NotRun | The graphical editor exited during startup on both attempts before exposing a window. Collection, restart and debugger inspection were not observed in the editor. The standalone graphical probe verified collection and restart. |
-| User manual play | Pass | On 2026-11-12 the user confirmed that food was collected, Snake grew, score increased and restarting reset the score. This confirmation and the recorded technical checks establish Stage 2 acceptance. |

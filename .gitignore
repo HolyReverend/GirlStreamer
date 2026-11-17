@@ -1,0 +1,3 @@
+# Local write-only work reports, including archived reports.
+/Reports/
+Report_*.md

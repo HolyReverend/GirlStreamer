@@ -1,6 +1,6 @@
 # Stage 2: Contextual Chat and Automatic Webcam — Detailed Implementation Plan
 
-Plan date: 2026-11-12. Implemented and headless-verified on 2026-11-13. See the execution record for windowed checks.
+Plan date: 2026-11-12. Implemented and headless-verified on 2026-11-13.
 
 > **For agentic workers:** Use `stage-orchestrator` for whole-stage execution and `executing-plans` for its tasks, subject to AGENTS.md. Keep one writer for session/HUD integration and one owner of the live editor. No automatic commits or pushes.
 
@@ -162,7 +162,7 @@ Stage 3 will add `show_reply(text, emotion, now_msec)` with a 3000 ms selected-r
 - [x] **C — Implement feed owner and history view.** Connect the bounded seeded feed to the HUD once.
 - [x] **D — Implement geometric webcam.** Draw five states and use active time for automatic priority and expiry.
 - [x] **E — Integrate lifetime boundaries.** Preserve Stage 1 accounting, input and pause behavior through finish and restart.
-- [x] **F — Validate and record.** Run focused and affected integration checks, load scenes and record the observed results below.
+- [x] **F — Validate and record.** Run focused and affected integration checks, load scenes and write the observed results to a new local work report.
 
 ## 10. Focused verification
 
@@ -195,23 +195,3 @@ Resolve `$godotExe` from project configuration at execution time. Intended comma
 New marker: `ITER02_STAGE02_FEEDBACK_PASS`; failures identify a case and exit nonzero. Require zero exit code and no unexpected diagnostics. Deliberate invalid-catalog cases must label their expected validation errors. Extend the focused runner for full-board event ordering and seeded independence; do not rerun every pure Snake rule suite unless its owning code changed or new evidence requires it.
 
 Also load touched scenes with the installed engine's supported workflow. Manual scenario: start, collect food, reach a milestone, collide, wait for retry, answer one placeholder question, pause with a transient, resize, resume, finish and restart. Verify readability and that looking at the webcam/chat does not obscure steering. Use a controlled fixture for rare board completion; do not require a human to fill the board. A full six-minute balance comparison belongs to Stage 7.
-
-## 11. Execution record
-
-- [x] Chat lines correspond to game/session contexts and obey history/repetition limits.
-- [x] Webcam implements five labelled states with fixed geometry.
-- [x] Score reset and final-food ordering preserve accounting and produce the intended feedback count.
-- [x] Pause, retry, finish and restart preserve their Stage 1 contracts.
-- [x] Focused and affected integration checks passed.
-- [x] Architecture and roadmap reflect actual implementation.
-
-Baseline `e2c63f0` had the accepted Stage 1 runtime and iteration plans in the working tree. The primary implemented session integration and tests. Sol bounded workers implemented feed/content and HUD/webcam, with separate review and desktop ownership. Usage totals are unavailable.
-
-Godot 4.7.2 console, 2026-11-13:
-
-- Baseline RED exited 1 with `ITER02_STAGE02_FEEDBACK_FAIL: session does not own a chat feed`.
-- Final feedback check exited 0 with `ITER02_STAGE02_FEEDBACK_PASS` (9 groups). Coverage includes retained snapshot isolation, scroll following, event priority and cutoff, pause and answer outcomes, seeded Snake independence and minimum layout with a full feed.
-- Lifetime (8), quick messages (5), timed session (5) and collisions (5) each exited 0 with their PASS marker. Lifetime emitted only the documented invalid configuration diagnostics. Startup scene smoke run exited 0.
-- Isolated editor import generated script UID files. The sandbox prevented saving editor settings and user data. The project scenes and scripts loaded in the runtime checks.
-- Windowed smoke at the configured 1024 × 768 confirmed readable Russian text, separate board, question, webcam and chat regions, wrapped lines and the newest chat entry visible. Observed a single greeting, focused play, food text and happy expression on collection, loss and waiting messages, neutral waiting baseline and retry retaining chat without repeating the greeting. The focused runner also covers milestones, all webcam states, transient timing, resize, finish and restart.
-- The user subsequently verified Stage 2 and confirmed it works correctly.
