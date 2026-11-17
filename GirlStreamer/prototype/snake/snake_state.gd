@@ -20,8 +20,7 @@ func reset(grid_size: Vector2i, random_source: RandomNumberGenerator) -> void:
 	_grid_size = grid_size
 	_random_source = random_source
 	_direction = Vector2i.RIGHT
-	_pending_direction = Vector2i.ZERO
-	_has_pending_turn = false
+	clear_pending_turn()
 	_score = 0
 	_finish_reason = &""
 	_body.clear()
@@ -29,6 +28,11 @@ func reset(grid_size: Vector2i, random_source: RandomNumberGenerator) -> void:
 	for segment in range(INITIAL_LENGTH):
 		_body.append(center - Vector2i(segment, 0))
 	_spawn_food()
+
+
+func clear_pending_turn() -> void:
+	_has_pending_turn = false
+	_pending_direction = Vector2i.ZERO
 
 
 func request_turn(candidate: Vector2i) -> bool:

@@ -9,6 +9,7 @@ const HUD_PATH := "PrototypeHUD/MarginContainer/VBoxContainer/"
 
 class ClockSession extends SessionScript:
 	var now := 1000
+	var fixture_started_at := 1000
 	var samples: Array[int] = []
 
 	func _now_msec() -> int:
@@ -60,7 +61,7 @@ func _session() -> ClockSession:
 	session.set_process(false)
 	game.set_physics_process(false)
 	for frame in range(12):
-		if game.is_playing():
+		if session.is_layout_ready() and session.start_session():
 			return session
 		await process_frame
 	session.free()
@@ -81,7 +82,7 @@ func _label(session: ClockSession, path: String) -> Label:
 
 
 func _results(session: ClockSession) -> Label:
-	return _label(session, "ResultsPanel/ResultsLabel")
+	return _label(session, "ResultsPanel/ResultsScroll/ResultsLabel")
 
 
 func _totals(session: ClockSession) -> Array[int]:
@@ -126,11 +127,11 @@ func _retry_preserves_session() -> bool:
 	session._process(0.0)
 	var waiting_ok := (
 		game.is_waiting_for_retry() and session.get_elapsed_seconds() == 1.0
-		and _label(session, "TimeLabel").text == "Time: 00:01"
+		and _label(session, "Header/Stats/TimeLabel").text == "Время: 00:01"
 	)
 	_press(KEY_SPACE)
 	var retry_ok := (
-		game.is_playing() and session._deadline_msec == 3000 and session.get_remaining_seconds() == 1.0
+		game.is_playing() and session.get_stream_time_msec() == 1000 and session.get_remaining_seconds() == 1.0
 		and _totals(session) == [3, 2, 1, 0] and _model(game).get_score() == 0
 		and session.get_instance_id() == session_id and _game(session).get_instance_id() == game_id
 	)
@@ -178,17 +179,17 @@ func _check_expiry_action(session: ClockSession, action: StringName) -> bool:
 			session.samples.assign([2999, 2999, 3000])
 			game._physics_process(0.6)
 			return (
-				_finished(session) and model.get_score() == 1 and _totals(session) == [1, 1, 0, 0]
+				_closing(session) and model.get_score() == 1 and _totals(session) == [1, 1, 0, 0]
 				and model.get_body_cells().size() == 4 and model.get_body_cells()[0] == Vector2i(5, 4)
 				and game.get_node("Board").get("_body") == model.get_body_cells()
-				and _results(session).is_visible_in_tree()
+				and not _results(session).is_visible_in_tree()
 			)
 		_:
 			game._physics_process(0.2)
 	var frozen: bool = (
-		_finished(session) and model.get_body_cells() == body_before and model.get_food_cell() == food_before
+		_closing(session) and model.get_body_cells() == body_before and model.get_food_cell() == food_before
 		and _totals(session) == totals_before and not model.get("_has_pending_turn")
-		and _results(session).is_visible_in_tree()
+		and not _results(session).is_visible_in_tree()
 	)
 	var result := _results(session).text
 	session._process(0.0)
@@ -213,9 +214,9 @@ func _accounting() -> bool:
 	session.now = 3000
 	session._process(0.0)
 	var accounting_ok := (
-		_finished(session) and _totals(session) == [5, 2, 1, 0]
-		and _label(session, "ScoreLabel").text == "Score: 2"
-		and _label(session, "SessionFoodLabel").text == "Session food: 5"
+		_closing(session) and _totals(session) == [5, 2, 1, 0]
+		and _label(session, "Header/Stats/ScoreLabel").text == "Счёт: 2"
+		and _label(session, "Header/Stats/SessionFoodLabel").text == "Еда за эфир: 5"
 	)
 	session.free()
 	return accounting_ok and await _full_board_accounting()
@@ -234,7 +235,7 @@ func _full_board_accounting() -> bool:
 	var board_ok := game.is_waiting_for_retry() and _totals(session) == [61, 1, 0, 1]
 	session.now = 3000
 	session._process(0.0)
-	var accounting_ok := board_ok and _finished(session) and _totals(session) == [61, 1, 0, 1]
+	var accounting_ok := board_ok and _closing(session) and _totals(session) == [61, 1, 0, 1]
 	session.free()
 	return accounting_ok
 
@@ -251,21 +252,22 @@ func _new_session_resets_once() -> bool:
 	_collide_with_three_food(game)
 	var reset_ok := true
 	for cycle in range(2):
-		session.now = session._deadline_msec
+		session.now = session.fixture_started_at + 2000
 		session._process(0.0)
 		_press(KEY_SPACE)
 		_press(KEY_ENTER, true, true)
 		_press(KEY_ENTER, false)
-		if not _finished(session):
+		if not _closing(session):
 			reset_ok = false
 			break
+		_press(KEY_ENTER)
 		session.now += 500
-		var expected_start := session.now
+		session.fixture_started_at = session.now
 		_press(KEY_ENTER)
 		session.now += 250
 		_press(KEY_ENTER)
 		if not (
-			session._start_msec == expected_start and session._deadline_msec == expected_start + 2000
+			session.get_stream_time_msec() == 250 and session.get_remaining_seconds() == 1.75
 			and _totals(session) == [0, 1, 0, 0] and game.is_playing()
 			and game.get("_accumulator_seconds") == 0.0 and not _results(session).is_visible_in_tree()
 			and _model(game).get_body_cells() == [Vector2i(4, 4), Vector2i(3, 4), Vector2i(2, 4)]
@@ -285,19 +287,21 @@ func _presentation_and_input_boundary() -> bool:
 	_collide_with_three_food(_game(session))
 	session.now = 2999
 	session._process(0.0)
-	var rounding_ok := _label(session, "TimeLabel").text == "Time: 00:01"
+	var rounding_ok := _label(session, "Header/Stats/TimeLabel").text == "Время: 00:01"
 	session.now = 3000
+	_press(KEY_ENTER)
+	var closing_ok := _closing(session)
 	_press(KEY_ENTER)
 	var text := _results(session).text
 	var result_ok := (
-		_finished(session) and session.get_elapsed_seconds() == 2.0
+		closing_ok and session.get_elapsed_seconds() == 2.0
 		and session.get_remaining_seconds() == 0.0 and _totals(session) == [3, 1, 1, 0]
-		and _label(session, "TimeLabel").text == "Time: 00:00"
-		and _label(session, "StatusLabel").text == "Session finished"
-		and _results(session).is_visible_in_tree() and text.contains("Elapsed: 00:02")
-		and text.contains("Total food: 3") and text.contains("Attempts started: 1")
-		and text.contains("Collisions: 1") and text.contains("Boards completed: 0")
-		and text.contains("Enter — new session.")
+		and _label(session, "Header/Stats/TimeLabel").text == "Время: 00:00"
+		and session._session_state == SessionScript.SessionState.FINISHED
+		and _results(session).is_visible_in_tree() and text.contains("Длительность: 00:02")
+		and text.contains("Собрано еды: 3") and text.contains("Начато попыток: 1")
+		and text.contains("Столкновения: 1") and text.contains("Заполнено полей: 0")
+		and _label(session, "Instructions").text == "Enter — новый стрим"
 	)
 	session.now = 4500
 	session._process(0.0)
@@ -306,9 +310,10 @@ func _presentation_and_input_boundary() -> bool:
 	return rounding_ok and result_ok and frozen_ok
 
 
-func _finished(session: ClockSession) -> bool:
+func _closing(session: ClockSession) -> bool:
 	var game := _game(session)
 	return (
-		not game.is_playing() and not game.is_waiting_for_retry()
-		and game.get("_accumulator_seconds") == 0.0 and _results(session).is_visible_in_tree()
+		session._session_state == SessionScript.SessionState.CLOSING
+		and not game.is_playing() and not game.is_waiting_for_retry()
+		and game.get("_accumulator_seconds") == 0.0 and not _results(session).is_visible_in_tree()
 	)

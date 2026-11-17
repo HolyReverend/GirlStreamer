@@ -129,16 +129,17 @@ func _controller_finishes_once() -> bool:
 
 
 func _parent_retries() -> bool:
-	var session := SESSION.instantiate()
-	session.set_script(ClockSession)
+	var scene := SESSION.instantiate()
+	scene.set_script(ClockSession)
+	var session := scene as ClockSession
 	var game := session.get_node("SnakeGame") as SnakeGame
 	_configure(game)
 	root.add_child(session)
 	for frame in range(12):
-		if game.is_playing():
+		if session.is_layout_ready():
 			break
 		await process_frame
-	var passed := game.is_playing() and _exercise_retry_cycles(session, game)
+	var passed := session.start_session() and _exercise_retry_cycles(session, game)
 	session.free()
 	return passed
 
@@ -154,15 +155,15 @@ func _exercise_retry_cycles(session: Node, game: SnakeGame) -> bool:
 	var first_food := expected_food.get_food_cell()
 	var session_id := session.get_instance_id()
 	var snake_id := game.get_instance_id()
-	var score := session.get_node("PrototypeHUD/MarginContainer/VBoxContainer/ScoreLabel") as Label
-	var status := session.get_node("PrototypeHUD/MarginContainer/VBoxContainer/StatusLabel") as Label
+	var score := session.get_node("PrototypeHUD/MarginContainer/VBoxContainer/Header/Stats/ScoreLabel") as Label
+	var status := session.get_node("PrototypeHUD/MarginContainer/VBoxContainer/Header/StatusLabel") as Label
 	game.score_changed.emit(2)
 	var events := _record_events(game)
 	root.push_input(_key(KEY_LEFT))
 	game._physics_process(1.0)
 	if (
-		not game.is_waiting_for_retry() or score.text != "Score: 2"
-		or status.text != "Self collision — press Space to retry."
+		not game.is_waiting_for_retry() or score.text != "Счёт: 2"
+		or status.text != "Столкновение с собой — пробел для новой попытки"
 	):
 		return false
 	root.push_input(_key(KEY_SPACE, true, true))
@@ -195,8 +196,8 @@ func _exercise_retry_cycles(session: Node, game: SnakeGame) -> bool:
 	game.set("_state", full)
 	game._physics_process(1.0)
 	if (
-		not game.is_waiting_for_retry() or score.text != "Score: 61"
-		or status.text != "Board complete — press Space to play again."
+		not game.is_waiting_for_retry() or score.text != "Счёт: 61"
+		or status.text != "Поле заполнено — пробел для новой попытки"
 	):
 		return false
 	root.push_input(_key(KEY_SPACE))
@@ -219,7 +220,7 @@ func _fresh_attempt(game: SnakeGame, state: SnakeState, food: Vector2i, score: L
 		and state.get_score() == 0 and not state.is_finished() and state.get_finish_reason() == &""
 		and state.has_food() and state.get_food_cell() == food
 		and Rect2i(Vector2i.ZERO, GRID).has_point(food) and not state.get_body_cells().has(food)
-		and score.text == "Score: 0" and status.text.is_empty() and not status.visible
+		and score.text == "Счёт: 0" and status.text.is_empty()
 	)
 
 

@@ -60,6 +60,10 @@ func stop() -> void:
 	_accumulator_seconds = 0.0
 
 
+func clear_pending_turn() -> void:
+	_state.clear_pending_turn()
+
+
 func restart_attempt() -> bool:
 	if not is_waiting_for_retry():
 		return false

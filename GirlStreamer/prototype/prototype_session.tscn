@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://prototype/prototype_session.gd" id="1_session"]
 [ext_resource type="PackedScene" path="res://prototype/snake/snake_game.tscn" id="2_snake"]
 [ext_resource type="PackedScene" path="res://prototype/ui/prototype_hud.tscn" id="3_hud"]
-[ext_resource type="Script" path="res://prototype/messages/quick_messages.gd" id="4_messages"]
+[ext_resource type="Script" path="res://prototype/stream/stream_choice.gd" id="4_choice"]
+[ext_resource type="Script" path="res://prototype/stream/chat_feed.gd" id="5_chat"]
+[ext_resource type="Script" path="res://prototype/stream/stream_director.gd" id="6_director"]
+[ext_resource type="Script" path="res://prototype/stream/donation_controller.gd" id="7_donations"]
+[ext_resource type="Script" path="res://prototype/stream/stream_audio.gd" id="8_audio"]
 
 [node name="PrototypeSession" type="Node"]
 script = ExtResource("1_session")
@@ -12,5 +16,17 @@ script = ExtResource("1_session")
 
 [node name="PrototypeHUD" parent="." instance=ExtResource("3_hud")]
 
-[node name="QuickMessages" type="Node" parent="."]
-script = ExtResource("4_messages")
+[node name="StreamChoice" type="Node" parent="."]
+script = ExtResource("4_choice")
+
+[node name="ChatFeed" type="Node" parent="."]
+script = ExtResource("5_chat")
+
+[node name="StreamDirector" type="Node" parent="."]
+script = ExtResource("6_director")
+
+[node name="DonationController" type="Node" parent="."]
+script = ExtResource("7_donations")
+
+[node name="StreamAudio" type="Node" parent="."]
+script = ExtResource("8_audio")
