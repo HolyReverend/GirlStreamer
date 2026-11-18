@@ -20,12 +20,10 @@ Project rules remain authoritative. Preserve Godot 4.7 Standard / GDScript and e
 
 ## Installation and maintenance
 
-Seven adapted skills are installed under `C:/Users/DrDre/.codex/skills/`, each in its named directory. The existing `godot-gamedev` was not changed. The new skills should be discoverable on the next turn; if a chat still has a stale catalog, reopen it and confirm the catalog before use.
+Seven adapted skills are installed under `C:/Users/DrDre/.codex/skills/`, each in its named directory. The existing `godot-gamedev` was not changed. All seven appeared in the Codex skill catalog on 2026-11-18. The Iteration 03 day-model task loaded `godot-gdscript` and `godot-gdscript-headless-testing` through the routes above.
 
 Source: https://github.com/gamedev-skills/awesome-gamedev-agent-skills, commit `25eec57919aec2cfd87d4ef9ae5661832302585e`, Apache-2.0. Each installed directory includes SOURCE.md, LICENSE and NOTICE. Preserve local adaptations when updating; do not overwrite them from upstream automatically.
 
 Local adaptations: narrow discovery triggers, common workflow delegated to godot-gamedev, on-demand technical references, conditional verification, corrections to lifecycle/typing/resource examples. Unsafe save/test templates and both bundled executable checkers were omitted. These skills provide guidance, not a runtime integration.
 
 Installed file inventory and hashes: [GodotSkillsInstallation.json](GodotSkillsInstallation.json).
-
-Discovery follow-up: [OI-004](../Docs/OpenItems/Items/OI-004-SkillDiscovery.md); check only when the relevant skills are needed.

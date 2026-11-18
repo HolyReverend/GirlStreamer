@@ -9,7 +9,6 @@ Next ID: **OI-117**. IDs are stable; gaps are intentional. Advance this counter 
 | [OI-001: Hear and assess stream audio](Items/OI-001-AudioAcceptance.md) | Audio, Iteration02 | Before final iteration 02 acceptance, or when changing stream audio. |
 | [OI-002: Complete standalone window and input checks](Items/OI-002-WindowAcceptance.md) | UI, Input, Iteration02 | Before final iteration 02 acceptance, or when changing stream layout/input. |
 | [OI-003: Complete human playtest and evaluate stream tuning](Items/OI-003-StreamPlaytest.md) | Playtest, Balance, UI, Iteration02 | When planning playtests or changing stream balance; before final iteration 02 acceptance. |
-| [OI-004: Confirm Godot skill discovery when next used](Items/OI-004-SkillDiscovery.md) | Codex, Godot, Skills | At the next Godot task using installed specialist skills, or after updating them. |
 | [OI-005: Validate MCP runtime access only when needed](Items/OI-005-McpRuntime.md) | Codex, Godot, MCP | When an authorized task requires MCP gameplay inspection/input, or after MCP configuration changes. |
 | [OI-101: Choose heroine details and story presentation](Items/OI-101-HeroineAndStory.md) | Narrative | When preparing the heroine brief or opening story. |
 | [OI-102: Choose visual rewards and asset workflow](Items/OI-102-VisualProduction.md) | Art | When planning the first art and animation pass. |
@@ -26,4 +25,4 @@ Next ID: **OI-117**. IDs are stable; gaps are intentional. Advance this counter 
 | [OI-113: Choose goals after self-sufficiency](Items/OI-113-BeyondSelfSufficiency.md) | Progression | When planning progression beyond the first financial milestone. |
 | [OI-114: Choose expanded arcade rules and rollout](Items/OI-114-ArcadeRosterAndRules.md) | Arcades | When planning the next arcade or revising Snake. |
 | [OI-115: Define and validate skill progression](Items/OI-115-SkillProgression.md) | Skills | When prototyping training and stream practice. |
-| [OI-116: Decide the full day and stream summary](Items/OI-116-ExpandedResults.md) | Stream UI | When adding paid subscriptions or end-of-day results. |
+| [OI-116: Decide the full day and stream summary](Items/OI-116-ExpandedResults.md) | Stream UI | When adding paid subscriptions or expanding the stream report. |

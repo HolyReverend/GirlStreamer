@@ -1,6 +1,8 @@
 class_name StreamContent
 extends RefCounted
 
+const Forecast = preload("res://prototype/day/stream_forecast.gd")
+
 const NICKNAMES: Array[String] = [
 	"Лис", "Иней", "Чиж", "Пиксель", "Мята", "Север", "Луна", "Кедр",
 ]
@@ -173,10 +175,12 @@ class ChoiceOption extends RefCounted:
 	var effects: Vector3
 	var chat_responses: Array[String]
 	var style_id: StringName
+	var hint: String
 
 	func _init(
 		option_id: StringName, intent: String, reply_text: String, reply_emotion: StringName,
-		effect_vector: Vector3, responses: Array[String], option_style_id: StringName = &""
+		effect_vector: Vector3, responses: Array[String], option_style_id: StringName = &"",
+		option_hint: String = ""
 	) -> void:
 		id = option_id
 		label = intent
@@ -185,9 +189,10 @@ class ChoiceOption extends RefCounted:
 		effects = effect_vector
 		chat_responses = responses.duplicate()
 		style_id = option_style_id
+		hint = option_hint
 
 	func snapshot() -> ChoiceOption:
-		return ChoiceOption.new(id, label, reply, emotion, effects, chat_responses, style_id)
+		return ChoiceOption.new(id, label, reply, emotion, effects, chat_responses, style_id, hint)
 
 	func is_valid() -> bool:
 		return (
@@ -217,6 +222,12 @@ class QuestionTemplate extends RefCounted:
 		prompt = question_prompt
 		context = question_context
 		options = question_options
+
+	func snapshot() -> QuestionTemplate:
+		var copied_options: Array[ChoiceOption] = []
+		for option in options:
+			copied_options.append(option.snapshot())
+		return QuestionTemplate.new(id, prompt, context, copied_options)
 
 
 class ChoiceDefinition extends RefCounted:
@@ -384,6 +395,63 @@ static func validate_questions(questions: Array[QuestionTemplate]) -> PackedStri
 			if option_ids.has(option.id):
 				errors.append("Повторяющийся идентификатор ответа: %s." % option.id)
 			option_ids[option.id] = true
+	return errors
+
+
+static func get_prepared_topic() -> QuestionTemplate:
+	return QuestionTemplate.new(&"prepared_snake_record", Forecast.TOPIC_QUESTION, &"general", [
+		ChoiceOption.new(
+			&"prepared_snake_record_room", "Оставлю себе место для разворота",
+			"Оставлю себе место для разворота. Так проще выбраться из угла.", &"focused", Vector3(3, 1, 0),
+			["Запас места решает!", "Ждём чистых разворотов!"], &"",
+			"Ты это репетировала · Понравится любителям игры"
+		),
+		ChoiceOption.new(
+			&"prepared_snake_record_chat", "Чат, какую тактику попробуем?",
+			"Чат, какую тактику попробуем? Я готова проверить ваши советы.", &"happy", Vector3(1, 3, 1),
+			["Держись ближе к центру!", "Главное не спешить за едой."]
+		),
+		ChoiceOption.new(
+			&"prepared_snake_record_wall", "Для начала постараюсь не врезаться на глазах у всех",
+			"Для начала постараюсь не врезаться на глазах у всех. Стена, мы договорились?", &"shy",
+			Vector3(0, 2, 3), ["Стена обещать ничего не стала.", "Мы всё равно за тебя!"]
+		),
+	])
+
+
+static func validate_prepared_topic(
+	template: QuestionTemplate, ordinary: Array[QuestionTemplate]
+) -> PackedStringArray:
+	if template == null:
+		return PackedStringArray(["Нет подготовленного вопроса."])
+	var errors := PackedStringArray()
+	if template.id.is_empty() or template.prompt.strip_edges().is_empty() or template.context not in _QUESTION_CONTEXTS:
+		errors.append("Проверьте идентификатор, текст и контекст подготовленного вопроса.")
+	var ordinary_option_ids: Dictionary[StringName, bool] = {}
+	for question in ordinary:
+		if question == null:
+			continue
+		if question.id == template.id:
+			errors.append("Повторяющийся идентификатор подготовленного вопроса: %s." % template.id)
+		for option in question.options:
+			if option != null:
+				ordinary_option_ids[option.id] = true
+	if not ChoiceDefinition.options_are_valid(template.options):
+		errors.append("Проверьте варианты ответа и эффекты подготовленного вопроса.")
+	var hinted_count := 0
+	for option in template.options:
+		if option == null:
+			continue
+		if ordinary_option_ids.has(option.id):
+			errors.append("Повторяющийся идентификатор подготовленного ответа: %s." % option.id)
+		if not option.style_id.is_empty():
+			errors.append("У подготовленного ответа %s не должно быть стиля реакции." % option.id)
+		if not option.hint.strip_edges().is_empty():
+			hinted_count += 1
+			if option.effects.x <= 0:
+				errors.append("Ответ с подсказкой должен нравиться любителям игры.")
+	if hinted_count != 1:
+		errors.append("У подготовленного вопроса должна быть ровно одна подсказка.")
 	return errors
 
 

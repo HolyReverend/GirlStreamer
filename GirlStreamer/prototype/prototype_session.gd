@@ -1,5 +1,7 @@
 extends Node
 
+signal managed_completed(results: StreamResults)
+
 enum SessionState { READY, RUNNING, PAUSED, CLOSING, FINISHED }
 
 const MIN_WINDOW_SIZE := Vector2i(1024, 768)
@@ -19,6 +21,8 @@ const Feed = preload("res://prototype/stream/chat_feed.gd")
 const Webcam = preload("res://prototype/ui/hero_webcam.gd")
 const StreamResults = preload("res://prototype/stream/stream_results.gd")
 const StreamAudio = preload("res://prototype/stream/stream_audio.gd")
+const DayModel = preload("res://prototype/day/day_state.gd")
+const Forecast = preload("res://prototype/day/stream_forecast.gd")
 
 class AudienceCause:
 	var kind: StringName
@@ -34,6 +38,7 @@ class AudienceCause:
 
 var _session_state: SessionState = SessionState.READY
 var _layout_ready := false
+var _launch_snapshot: DayModel.LaunchSnapshot
 var _elapsed_before_run_msec := 0
 var _run_started_msec := 0
 var _duration_msec := 0
@@ -61,6 +66,7 @@ var _next_stream_event_id := 1
 var _presented_milestones: Dictionary[int, bool] = {}
 var _next_food_feedback_msec := 0
 var _audience := Audience.new()
+var _initial_viewers := Audience.INITIAL_TOTAL
 var _next_audience_step_msec := 1000
 var _audience_time_msec := 0
 var _last_audience_event_id := 0
@@ -100,7 +106,7 @@ func _ready() -> void:
 	_chat_feed.lines_changed.connect(_hud.set_chat_lines)
 	_donations.donation_received.connect(_on_donation_received)
 	_hud.show_ready()
-	_hud.set_muted(muted)
+	set_muted(muted)
 	_apply_initial_layout.call_deferred()
 
 
@@ -122,8 +128,18 @@ func is_stream_active() -> bool:
 	return _session_state == SessionState.RUNNING
 
 
-func start_session() -> bool:
-	if not _layout_ready:
+func is_finished() -> bool:
+	return _session_state == SessionState.FINISHED
+
+
+func set_muted(value: bool) -> void:
+	muted = value
+	_stream_audio.set_muted(value)
+	_hud.set_muted(value)
+
+
+func start_session(launch: DayModel.LaunchSnapshot = null) -> bool:
+	if not _layout_ready or _launch_snapshot != null:
 		return false
 	if _session_state != SessionState.READY and _session_state != SessionState.FINISHED:
 		return false
@@ -137,7 +153,8 @@ func start_session() -> bool:
 		push_error("PrototypeSession requires a record reward interval between 1 and 120 seconds.")
 		_hud.set_status("Не удалось начать: проверьте настройки аудитории")
 		return false
-	var question_errors := Content.validate_questions(Content.get_questions())
+	var ordinary_questions := Content.get_questions()
+	var question_errors := Content.validate_questions(ordinary_questions)
 	question_errors.append_array(Content.validate_reactions(Content.get_reactions()))
 	if not _has_valid_message_settings() or not question_errors.is_empty():
 		push_error("PrototypeSession requires valid question timing and content.")
@@ -145,6 +162,14 @@ func start_session() -> bool:
 			push_error(" ".join(question_errors))
 		_hud.set_status("Не удалось начать: проверьте настройки вопросов")
 		return false
+	var prepared_topic: Content.QuestionTemplate
+	if launch != null and launch.topic_prepared:
+		prepared_topic = _get_prepared_topic()
+		var topic_errors := Content.validate_prepared_topic(prepared_topic, ordinary_questions)
+		if not topic_errors.is_empty():
+			push_error("Invalid prepared topic: " + " ".join(topic_errors))
+			_hud.set_status("Не удалось начать: проверьте подготовленную тему")
+			return false
 	var content_errors := Content.validate()
 	if not content_errors.is_empty():
 		push_error("Invalid stream chat content: %s" % "; ".join(content_errors))
@@ -178,8 +203,15 @@ func start_session() -> bool:
 	_webcam.reset()
 	_director.reset()
 	_reset_choices()
-	_reset_audience()
+	var opening_bonus := Forecast.ANNOUNCEMENT_VIEWERS_PER_GROUP if launch != null and launch.post_published else 0
+	_reset_audience(opening_bonus)
 	_reset_donations()
+	var warning_range := 0
+	var question_window_scale := 1.0
+	if launch != null:
+		warning_range = Forecast.warning_cells(launch.mastery_level, launch.vigor)
+		question_window_scale = Forecast.question_window_scale(launch.concentration)
+	_snake_game.set_warning_range(warning_range)
 	_session_state = SessionState.RUNNING
 	_snake_game.start()
 	if not _snake_game.is_playing():
@@ -195,14 +227,23 @@ func start_session() -> bool:
 	_attempts_started = 1
 	_session_messages_enabled = messages_enabled
 	_hud.set_messages_enabled(_session_messages_enabled)
-	_director.start(_session_messages_enabled, roundi(question_window_seconds * 1000.0))
+	_director.start(
+		_session_messages_enabled, roundi(question_window_seconds * 1000.0),
+		question_window_scale, prepared_topic
+	)
 	_director.on_attempt_started(_attempts_started)
 	_show_audience()
 	_chat_feed.start(0)
 	_donations.start()
 	_webcam.set_playing(true)
 	_hud.set_remaining_time(_duration_msec / 1000.0)
+	if launch != null:
+		_launch_snapshot = launch.copy()
 	return true
+
+
+func _get_prepared_topic() -> Content.QuestionTemplate:
+	return Content.get_prepared_topic()
 
 
 func _has_valid_message_settings() -> bool:
@@ -334,14 +375,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"stream_mute"):
 		get_viewport().set_input_as_handled()
-		muted = not muted
-		_stream_audio.set_muted(muted)
-		_hud.set_muted(muted)
+		set_muted(not muted)
 	elif event.is_action_pressed(&"session_restart"):
 		get_viewport().set_input_as_handled()
 		match _session_state:
 			SessionState.READY, SessionState.FINISHED:
-				start_session()
+				if _launch_snapshot == null:
+					start_session()
 			SessionState.RUNNING:
 				_sample_running_time_msec()
 			SessionState.CLOSING:
@@ -402,7 +442,10 @@ func _complete_closing() -> void:
 		return
 	_session_state = SessionState.FINISHED
 	_stream_audio.stop_all()
-	_hud.show_stream_results(_results)
+	if _launch_snapshot != null:
+		managed_completed.emit(_results)
+	else:
+		_hud.show_stream_results(_results)
 
 
 func build_results_snapshot() -> StreamResults:
@@ -412,7 +455,7 @@ func build_results_snapshot() -> StreamResults:
 		return null
 	var result := StreamResults.new()
 	result.audience = get_audience_snapshot()
-	result.initial_viewers = Audience.INITIAL_TOTAL
+	result.initial_viewers = _initial_viewers
 	result.donation_count = _donations.get_count()
 	result.donation_total = _donations.get_total()
 	result.elapsed_seconds = get_elapsed_seconds()
@@ -669,8 +712,9 @@ func _get_viewer_count() -> int:
 	return get_audience_snapshot().total
 
 
-func _reset_audience() -> void:
-	_audience.reset()
+func _reset_audience(opening_bonus_per_group: int) -> void:
+	_audience.reset(opening_bonus_per_group)
+	_initial_viewers = get_audience_snapshot().total
 	_next_audience_step_msec = 1000
 	_audience_time_msec = 0
 	_last_audience_event_id = 0
@@ -683,6 +727,7 @@ func _reset_audience() -> void:
 	_rewarded_loss_reactions = 0
 	_audience_causes.clear()
 	_hud.set_audience(null, "")
+	_hud.set_opening_audience(_initial_viewers, _initial_viewers - Audience.INITIAL_TOTAL)
 
 
 func _advance_audience(time_msec: int) -> bool:

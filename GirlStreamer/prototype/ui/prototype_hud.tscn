@@ -167,6 +167,13 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 14
 clip_text = true
 
+[node name="Opening" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+clip_text = true
+
 [node name="Gamers" type="Label" parent="MarginContainer/VBoxContainer/MainArea/SideColumn/StatisticsPanel/StatisticsContent/AudienceStrip"]
 layout_mode = 2
 mouse_filter = 2
@@ -257,7 +264,6 @@ clip_text = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_font_sizes/font_size = 14
-clip_text = true
 
 [node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/MainArea/LeftColumn/ChoiceArea/MessageContent"]
 custom_minimum_size = Vector2(0, 40)

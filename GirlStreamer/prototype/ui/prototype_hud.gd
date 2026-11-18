@@ -7,14 +7,11 @@ const WebcamView = preload("res://prototype/ui/hero_webcam.gd")
 const Content = preload("res://prototype/stream/stream_content.gd")
 const Audience = preload("res://prototype/stream/audience_state.gd")
 const StreamResults = preload("res://prototype/stream/stream_results.gd")
-const REACTION_STYLE_LABELS := {
-	&"competitive": "Азартно",
-	&"humor": "С юмором",
-	&"flirt": "Кокетливо",
-}
-const AUDIENCE_GROUP_NAMES := ["Геймеры", "Любители общения", "Поклонники образа"]
+const ResultText = preload("res://prototype/stream/stream_result_text.gd")
 const DONATION_NOTIFICATION_MSEC := 3000
 const DONATION_PENDING_LIMIT := 3
+const CHOICE_OPTION_TWO_LINE_HEIGHT := 40
+const CHOICE_OPTION_ONE_LINE_HEIGHT := 20
 
 const RUNNING_INSTRUCTIONS := (
 	"Стрелки / WASD — движение. 1–3 — ответ.\nПробел — новая попытка. Esc — пауза."
@@ -44,6 +41,7 @@ var _donation_overflow_amount := 0
 @onready var _donation_notification: Label = _donation_strip.get_node("NotificationSlot/Notification")
 @onready var _audience_strip: VBoxContainer = _statistics_content.get_node("AudienceStrip")
 @onready var _audience_totals: Label = _audience_strip.get_node("Totals")
+@onready var _opening_audience: Label = _audience_strip.get_node("Opening")
 @onready var _audience_explanation: Label = _audience_strip.get_node("Explanation")
 @onready var _audience_groups: Array[Label] = [
 	_audience_strip.get_node("Gamers") as Label,
@@ -68,6 +66,7 @@ var _donation_overflow_amount := 0
 @onready var _message_prompt: Label = _message_content.get_node("PromptLabel")
 @onready var _message_countdown: Label = _message_content.get_node("Heading/CountdownLabel")
 @onready var _message_feedback: Label = _message_content.get_node("FeedbackLabel")
+@onready var _message_option_grid: GridContainer = _message_content.get_node("Options")
 @onready var _message_options: Array[Label] = [
 	_message_content.get_node("Options/Option1Label") as Label,
 	_message_content.get_node("Options/Option2Label") as Label,
@@ -141,6 +140,13 @@ func _show_donation(record: Content.DonationRecord, now_msec: int) -> void:
 	_donation_deadline_msec = now_msec + DONATION_NOTIFICATION_MSEC
 
 
+func set_opening_audience(initial_viewers: int, announcement_gain: int) -> void:
+	_opening_audience.visible = announcement_gain > 0
+	_opening_audience.text = "На старте: %d · От анонса: +%d" % [
+		initial_viewers, announcement_gain,
+	] if announcement_gain > 0 else ""
+
+
 func set_audience(snapshot: Audience.Snapshot, explanation: String) -> void:
 	if snapshot == null:
 		_audience_totals.text = ""
@@ -151,18 +157,10 @@ func set_audience(snapshot: Audience.Snapshot, explanation: String) -> void:
 	_audience_totals.text = "Зрители: %d   |   Пик: %d" % [snapshot.total, snapshot.peak]
 	for index in range(_audience_groups.size()):
 		_audience_groups[index].text = "%s: %d · %s" % [
-			AUDIENCE_GROUP_NAMES[index], snapshot.counts[index],
-			_impression_description(snapshot.precise_impressions[index]),
+			ResultText.AUDIENCE_GROUP_NAMES[index], snapshot.counts[index],
+			ResultText.impression_description(snapshot.precise_impressions[index]),
 		]
 	_audience_explanation.text = explanation
-
-
-func _impression_description(impression: float) -> String:
-	if impression < 40.0:
-		return "интерес снижается"
-	if impression > 60.0:
-		return "увлечены"
-	return "спокойный интерес"
 
 
 func set_score(score: int) -> void:
@@ -204,105 +202,22 @@ func _update_status() -> void:
 
 
 func set_remaining_time(seconds: float) -> void:
-	_time_label.text = "Время: %s" % _format_time(seconds)
+	_time_label.text = "Время: %s" % ResultText.format_time(seconds)
 
 
 func set_total_food(total: int) -> void:
 	_session_food_label.text = "Еда за эфир: %d" % total
 
 
-func show_stream_results(results: StreamResults) -> void:
-	var rows := PackedStringArray([
-		"Игра",
-		"Длительность: %s из %s   |   Лучший счёт: %d" % [
-			_format_time(results.elapsed_seconds), _format_time(results.duration_seconds),
-			results.best_score,
-		],
-		"Собрано еды: %d   |   Начато попыток: %d   |   Столкновения: %d   |   Заполнено полей: %d" % [
-			results.total_food, results.attempts_started, results.collisions, results.boards_completed,
-		],
-		"", "Аудитория",
-	])
-	if results.audience != null:
-		_append_audience_results(rows, results)
-	else:
-		rows.append("нет данных")
-	rows.append_array(PackedStringArray([
-		"", "Донаты",
-		"Донаты: %d   |   Получено монет: %d" % [results.donation_count, results.donation_total],
-		"", "Общение",
-	]))
-	_append_communication_results(rows, results)
-	rows.append_array(PackedStringArray(["", "Моменты эфира", "Моменты, понравившиеся зрителям"]))
-	if results.highlights.is_empty():
-		rows.append("нет данных")
-	for highlight in results.highlights:
-		var changes := PackedStringArray()
-		for index in range(AUDIENCE_GROUP_NAMES.size()):
-			if not is_zero_approx(highlight.delta[index]):
-				changes.append("%s: %+.1f" % [AUDIENCE_GROUP_NAMES[index], highlight.delta[index]])
-		rows.append("%s · %s" % [
-			_format_time(highlight.time_msec / 1000.0), highlight.explanation,
-		])
-		if not changes.is_empty():
-			rows.append("Впечатление: %s" % " · ".join(changes))
-	_results_label.text = "\n".join(rows)
+func show_stream_results(results: StreamResults, can_restart: bool = true) -> void:
+	_results_label.text = ResultText.format_results(results)
 	_paused = false
 	set_status("Итоги эфира")
-	_results_instructions.show()
+	_results_instructions.visible = can_restart
 	_main_area.hide()
 	_choice_area.hide()
 	_results_panel.show()
 	_results_scroll.scroll_vertical = 0
-
-
-func _append_audience_results(rows: PackedStringArray, results: StreamResults) -> void:
-	var snapshot := results.audience
-	rows.append("Зрители: в начале %d   |   В конце %d   |   Пик %d" % [
-		results.initial_viewers, snapshot.total, snapshot.peak,
-	])
-	for index in range(AUDIENCE_GROUP_NAMES.size()):
-		var impression := snapshot.precise_impressions[index]
-		rows.append("%s: %d · %s (%.1f)" % [
-			AUDIENCE_GROUP_NAMES[index], snapshot.counts[index],
-			_impression_description(impression), impression,
-		])
-	rows.append("Часть зрителей могла прийти или уйти со временем.")
-
-
-func _append_communication_results(rows: PackedStringArray, results: StreamResults) -> void:
-	var donors := results.donation_question_counts
-	var answered := results.questions_answered + donors.y
-	var resolved := answered + results.questions_expired + donors.z
-	var latency := results.question_latency_seconds + results.donation_question_latency_seconds
-	var rate := "%.0f%%" % (float(answered) / resolved * 100.0) if resolved > 0 else "нет данных"
-	var mean := "%.2f с" % (latency / answered) if answered > 0 else "нет данных"
-	rows.append("Вопросы: %s" % ("включены" if results.messages_enabled else "отключены"))
-	rows.append("Доля ответов: %s   |   Среднее время ответа: %s" % [rate, mean])
-	_append_choice_counts(rows, "Обычные вопросы", Vector4i(
-		results.questions_shown, results.questions_answered,
-		results.questions_expired, results.questions_cancelled,
-	))
-	_append_choice_counts(rows, "Вопросы с донатом", donors)
-	_append_choice_counts(rows, "Реакции", results.reaction_counts, "Выбрано")
-	_append_choice_counts(rows, "Все обращения", results.choice_totals)
-	rows.append("Выбранные реакции")
-	if results.selected_reactions.is_empty():
-		rows.append("нет данных")
-	for reaction in results.selected_reactions:
-		var style: String = REACTION_STYLE_LABELS.get(reaction.style, String(reaction.style))
-		var source := reaction.source_caption
-		if source.is_empty():
-			source = "Событие в игре"
-		rows.append("• %s — %s" % [style, source])
-
-
-func _append_choice_counts(
-	rows: PackedStringArray, title: String, counts: Vector4i, answer_label: String = "Ответов"
-) -> void:
-	rows.append("%s: %d   |   %s: %d   |   Истекло: %d   |   Отменено: %d" % [
-		title, counts.x, answer_label, counts.y, counts.z, counts.w,
-	])
 
 
 func hide_session_results() -> void:
@@ -326,8 +241,23 @@ func show_question(definition: Content.ChoiceDefinition) -> void:
 		_:
 			_message_header.text = "%s спрашивает" % definition.nick
 	_message_prompt.text = definition.prompt
+	var has_hint := false
+	for option in definition.options:
+		if not option.hint.strip_edges().is_empty():
+			has_hint = true
+			break
+	# Give a hinted reply the full width for its label and explanation.
+	_message_option_grid.columns = 1 if has_hint else 2
 	for index in range(_message_options.size()):
-		_message_options[index].text = "%d — %s" % [index + 1, definition.options[index].label]
+		var option := definition.options[index]
+		var label := _message_options[index]
+		var hint := option.hint.strip_edges()
+		label.text = "%d — %s" % [index + 1, option.label]
+		label.custom_minimum_size.y = CHOICE_OPTION_TWO_LINE_HEIGHT
+		if not hint.is_empty():
+			label.text += "\n%s" % hint
+		elif has_hint:
+			label.custom_minimum_size.y = CHOICE_OPTION_ONE_LINE_HEIGHT
 
 
 func set_question_time(seconds: float) -> void:
@@ -342,8 +272,10 @@ func clear_question(show_idle_status: bool = true) -> void:
 		_message_header.text = ""
 	_message_prompt.text = ""
 	_message_countdown.text = ""
+	_message_option_grid.columns = 2
 	for option in _message_options:
 		option.text = ""
+		option.custom_minimum_size.y = CHOICE_OPTION_TWO_LINE_HEIGHT
 
 
 func set_message_feedback(text: String) -> void:
@@ -357,11 +289,6 @@ func set_messages_enabled(enabled: bool) -> void:
 
 func _clear_idle_heading() -> void:
 	_message_header.text = "Ожидание обращения" if _messages_enabled else "Интерактивные обращения отключены"
-
-
-func _format_time(seconds: float) -> String:
-	var whole_seconds := ceili(maxf(0.0, seconds))
-	return "%02d:%02d" % [floori(whole_seconds / 60.0), whole_seconds % 60]
 
 
 func _report_board_rect() -> void:

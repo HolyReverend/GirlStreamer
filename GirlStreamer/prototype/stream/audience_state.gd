@@ -32,8 +32,9 @@ func _init() -> void:
 	reset()
 
 
-func reset() -> void:
-	_counts = Vector3i.ONE * INITIAL_COUNT
+func reset(opening_bonus_per_group: int = 0) -> void:
+	var opening_count := INITIAL_COUNT + clampi(opening_bonus_per_group, 0, MAX_VIEWERS - INITIAL_COUNT)
+	_counts = Vector3i.ONE * opening_count
 	_impressions = [50.0, 50.0, 50.0]
 	_carries = [0.0, 0.0, 0.0]
 	_style_uses.clear()

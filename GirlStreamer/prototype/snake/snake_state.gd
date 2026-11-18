@@ -3,6 +3,23 @@ extends RefCounted
 
 const INITIAL_LENGTH := 3
 const NO_FOOD := Vector2i(-1, -1)
+const MAX_WARNING_RANGE := 2
+
+
+class DangerHint extends RefCounted:
+	var kind: StringName
+	var distance: int
+	var last_legal_head: Vector2i
+	var attempted_cell: Vector2i
+
+	func _init(
+		collision_kind: StringName, steps: int, legal_head: Vector2i, target: Vector2i
+	) -> void:
+		kind = collision_kind
+		distance = steps
+		last_legal_head = legal_head
+		attempted_cell = target
+
 
 var _body: Array[Vector2i] = []
 var _grid_size: Vector2i
@@ -53,15 +70,9 @@ func step() -> bool:
 		_has_pending_turn = false
 	var next_head := _body[0] + _direction
 	var collected := _has_food and next_head == _food_cell
-	if not Rect2i(Vector2i.ZERO, _grid_size).has_point(next_head):
-		_finish_reason = &"wall_collision"
+	_finish_reason = _collision_kind(_body, next_head, collected)
+	if is_finished():
 		return false
-	# A normal step vacates the tail; growth retains every segment.
-	var retained_count := _body.size() if collected else _body.size() - 1
-	for index in range(retained_count):
-		if _body[index] == next_head:
-			_finish_reason = &"self_collision"
-			return false
 	_body.push_front(next_head)
 	if collected:
 		_score += 1
@@ -70,6 +81,44 @@ func step() -> bool:
 	else:
 		_body.pop_back()
 	return true
+
+
+func predict_danger(max_steps: int) -> DangerHint:
+	var steps := clampi(max_steps, 0, MAX_WARNING_RANGE)
+	if steps == 0 or is_finished() or _body.is_empty():
+		return null
+
+	var projected_body: Array[Vector2i] = _body.duplicate()
+	var direction := _pending_direction if _has_pending_turn else _direction
+	var food_available := _has_food
+	for distance in range(1, steps + 1):
+		var head := projected_body[0]
+		var target := head + direction
+		var collected := food_available and target == _food_cell
+		var kind := _collision_kind(projected_body, target, collected)
+		if not kind.is_empty():
+			return DangerHint.new(kind, distance, head, target)
+
+		projected_body.push_front(target)
+		if collected:
+			if projected_body.size() == _grid_size.x * _grid_size.y:
+				return null
+			# New food must be on a free cell, so it cannot affect the next collision.
+			food_available = false
+		else:
+			projected_body.pop_back()
+	return null
+
+
+func _collision_kind(body: Array[Vector2i], target: Vector2i, collected: bool) -> StringName:
+	if not Rect2i(Vector2i.ZERO, _grid_size).has_point(target):
+		return &"wall_collision"
+	# A normal step vacates the tail; growth retains every segment.
+	var retained_count := body.size() if collected else body.size() - 1
+	for index in range(retained_count):
+		if body[index] == target:
+			return &"self_collision"
+	return &""
 
 
 func get_body_cells() -> Array[Vector2i]:

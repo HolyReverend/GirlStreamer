@@ -6,12 +6,14 @@ const GRID := Color("#293941")
 const BODY := Color("#47bb86")
 const HEAD := Color("#c2f58c")
 const FOOD := Color("#ffad66")
+const DANGER := Color("#ffd078")
 
 var _board_rect: Rect2
 var _grid_size: Vector2i
 var _body: Array[Vector2i] = []
 var _food_present := false
 var _food_cell: Vector2i
+var _danger_hint: SnakeState.DangerHint
 
 
 func set_board_rect(rect: Rect2) -> void:
@@ -26,6 +28,11 @@ func set_snapshot(
 	_body = body_cells.duplicate()
 	_food_present = food_present
 	_food_cell = food_cell
+	queue_redraw()
+
+
+func set_danger_hint(hint: SnakeState.DangerHint) -> void:
+	_danger_hint = hint
 	queue_redraw()
 
 
@@ -54,3 +61,22 @@ func _draw() -> void:
 	for index in range(_body.size() - 1, -1, -1):
 		var segment := Rect2(origin + Vector2(_body[index]) * cell_size, segment_size)
 		draw_rect(segment.grow(-cell_size * 0.08), HEAD if index == 0 else BODY)
+
+	_draw_danger_hint(origin, cell_size)
+
+
+func _draw_danger_hint(origin: Vector2, cell_size: float) -> void:
+	if _danger_hint == null:
+		return
+	var stroke := clampf(cell_size * 0.10, 1.0, 4.0)
+	if _danger_hint.kind == &"self_collision":
+		var cell_rect := Rect2(
+			origin + Vector2(_danger_hint.attempted_cell) * cell_size, Vector2.ONE * cell_size
+		)
+		draw_rect(cell_rect.grow(-cell_size * 0.20), DANGER, false, stroke)
+	elif _danger_hint.kind == &"wall_collision":
+		var outward := Vector2(_danger_hint.attempted_cell - _danger_hint.last_legal_head)
+		var center := origin + (Vector2(_danger_hint.last_legal_head) + Vector2.ONE * 0.5) * cell_size
+		var edge := center + outward * cell_size * 0.39
+		var half_edge := outward.orthogonal() * cell_size * 0.33
+		draw_line(edge - half_edge, edge + half_edge, DANGER, stroke, true)

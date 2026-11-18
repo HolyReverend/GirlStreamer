@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Director = preload("res://prototype/stream/stream_director.gd")
+const Choice = preload("res://prototype/stream/stream_choice.gd")
 const Content = preload("res://prototype/stream/stream_content.gd")
 const Event = preload("res://prototype/stream/stream_event.gd")
 
@@ -14,25 +15,33 @@ var _checks := 0
 
 func _initialize() -> void:
 	_test_timing()
+	_test_concentration_windows()
 	_test_donation_during_question()
 	_test_priority_and_copy()
 	_test_expiry_and_watermarks()
 	_test_attempts_and_variants()
 	_test_cap_and_lifecycle()
+	_test_prepared_content()
+	_test_prepared_priority()
+	_test_prepared_rejection_and_retry()
+	_test_prepared_cap_and_lifecycle()
 	_director.free()
 	if _failures == 0:
 		print("ITER02_STAGE04_DIRECTOR_PASS (%d checks)" % _checks)
 	quit(1 if _failures else 0)
 
 
-func _setup(cap: int = 8, enabled: bool = true) -> void:
+func _setup(
+	cap: int = 8, enabled: bool = true, window_msec: int = 6000, scale: float = 1.0,
+	prepared: Content.QuestionTemplate = null
+) -> void:
 	if _director != null:
 		_director.free()
 	_director = Director.new()
 	_director.configure(_open)
 	_director.opening_cap = cap
 	_director.reset()
-	_director.start(enabled)
+	_director.start(enabled, window_msec, scale, prepared)
 	_director.on_attempt_started(1)
 	_requests.clear()
 	_opened.clear()
@@ -99,29 +108,68 @@ func _test_timing() -> void:
 	_check(_opened.size() == 3, "No missed openings are replayed")
 
 
+func _test_concentration_windows() -> void:
+	var scales: Array[float] = [1.0, 0.9, 0.8]
+	var viewers: Array[int] = [30, 60, 130]
+	var expected := [[6000, 5400, 5000], [5700, 5130, 5000], [5000, 5000, 5000]]
+	for viewer_index in range(viewers.size()):
+		var viewer_count := viewers[viewer_index]
+		for tier in range(scales.size()):
+			_setup(8, true, 6000, scales[tier])
+			_director.set_viewer_count_provider(func() -> int: return viewer_count)
+			_director.tick(20000, true)
+			_check(
+				_opened.size() == 1 and _opened[0].window_msec == expected[viewer_index][tier],
+				"Ordinary window for %d viewers at scale %.2f" % [viewer_count, scales[tier]]
+			)
+	_setup(8, true, 6000, 0.9)
+	_director.tick(20000, true)
+	_check(_opened.size() == 1 and _opened[0].window_msec == 5400, "No provider uses the 6000 ms base")
+	_setup(8, true, 4000, 0.8)
+	_director.set_viewer_count_provider(func() -> int: return 130)
+	_director.tick(20000, true)
+	_check(_opened.size() == 1 and _opened[0].window_msec == 4000, "Custom window bypasses scale and floor")
+
+
 func _test_donation_during_question() -> void:
-	_setup()
+	_setup(8, true, 6000, 0.9)
 	var viewers := [30]
 	_director.set_viewer_count_provider(func() -> int: return viewers[0])
 	_director.tick(30000, true)
 	_director.submit_donation_question(_donation(1), 31000)
 	_director.tick(32000, true)
 	_check(_opened.size() == 1, "Donation does not replace an open question")
-	_resolve(1, 36000, &"expired")
+	_resolve(1, 35400, &"expired")
 	_director.tick(49999, true)
 	_check(_opened.size() == 1, "Donation respects the shared gap")
-	viewers[0] = 80
+	viewers[0] = 60
 	_director.tick(50000, true)
 	_check(_opened.size() == 2 and _opened.back().kind == &"donation_question", "Donation survives question and gap")
-	_check(_opened.back().window_msec == 5500 and _opened.back().donation_amount == 5, "Donor window samples latest audience and keeps amount")
-	_setup()
+	_check(_opened.back().window_msec == 5130 and _opened.back().donation_amount == 5, "Donor window samples latest audience and keeps amount")
+	var choice := Choice.new()
+	_check(choice.try_open(_opened.back(), 50000), "Choice controller admits the sampled donor question")
+	viewers[0] = 130
+	_director.on_attempt_started(2)
+	choice.tick(55129)
+	_check(choice.is_open(), "Donor question stays open one millisecond before its sampled deadline")
+	choice.tick(55130)
+	var resolution := choice.get_last_resolution()
+	_check(
+		resolution != null and resolution.outcome == &"expired" and resolution.elapsed_msec == 5130,
+		"Donor question expires at the sampled deadline after audience change and retry"
+	)
+	choice.free()
+	_setup(8, true, 6000, 0.8)
 	_director.tick(30000, true)
 	_resolve(1, 33000)
 	_event(1, Event.Kind.RECORD, 49000, 6)
 	_director.tick(49999, true)
 	_check(_opened.size() == 1, "Fresh reaction waits for the shared gap")
 	_director.tick(50000, true)
-	_check(_opened.size() == 2 and _opened.back().kind == &"reaction", "Fresh reaction opens at the shared boundary")
+	_check(
+		_opened.size() == 2 and _opened.back().kind == &"reaction" and _opened.back().window_msec == 3000,
+		"Fresh reaction opens at the shared boundary and keeps its window at low concentration"
+	)
 
 
 func _test_priority_and_copy() -> void:
@@ -239,6 +287,130 @@ func _test_cap_and_lifecycle() -> void:
 	_check(_requests.is_empty() and _director._pending_reaction == null and _director._pending_donation == null, "Disabled mode does not queue")
 	_director.opening_cap = 9
 	_check(not _director.has_valid_settings(), "Invalid opening cap rejected")
+
+
+func _test_prepared_content() -> void:
+	var ordinary := Content.get_questions()
+	var prepared := Content.get_prepared_topic()
+	_check(ordinary.size() == 12, "Prepared topic stays outside the ordinary catalog")
+	_check(Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Prepared content validates")
+	var copy := prepared.options[0].snapshot()
+	prepared.options[0].hint = ""
+	_check(not copy.hint.is_empty() and copy.effects.x > 0, "Copied hint retains its gaming benefit")
+	_check(not Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Missing hint rejected")
+	prepared = Content.get_prepared_topic()
+	prepared.options[1].hint = copy.hint
+	_check(not Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Second hint rejected")
+	prepared = Content.get_prepared_topic()
+	prepared.options[0].effects = Vector3.ZERO
+	_check(not Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Hint without gaming benefit rejected")
+	prepared = Content.get_prepared_topic()
+	prepared.id = ordinary[0].id
+	_check(not Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Duplicate template ID rejected")
+	prepared = Content.get_prepared_topic()
+	prepared.options.pop_back()
+	_check(not Content.validate_prepared_topic(prepared, ordinary).is_empty(), "Prepared topic needs three replies")
+	_check(not Content.validate_prepared_topic(null, ordinary).is_empty(), "Missing prepared template rejected")
+
+
+func _test_prepared_priority() -> void:
+	var prepared := Content.get_prepared_topic()
+	var hint := prepared.options[0].hint
+	_setup(8, true, 6000, 0.9, prepared)
+	prepared.options[0].hint = ""
+	_director.set_viewer_count_provider(func() -> int: return 60)
+	_director.submit_donation_question(_donation(1), 19990)
+	_event(1, Event.Kind.RECORD, 19990)
+	_director.tick(19999, true)
+	_check(_requests.is_empty(), "Reservation waits for the common first delay")
+	_director.tick(20000, true)
+	_check(
+		_opened.size() == 1 and _opened[0].template_id == prepared.id and _opened[0].kind == &"question",
+		"Prepared ordinary question wins over an eligible donor and a nonterminal reaction"
+	)
+	_check(
+		_opened.size() == 1 and _opened[0].source_event_id == 0 and _opened[0].source_attempt_id == 0
+		and _opened[0].source_event_kind.is_empty() and _opened[0].options[0].hint == hint
+		and _opened[0].window_msec == 5130,
+		"Prepared opening has copied hint, live window and no attempt source"
+	)
+	_check(_director._pending_reaction != null, "Prepared opening leaves the fresh reaction pending")
+	_resolve(1, 21000)
+	_director.tick(40000, true)
+	_check(
+		_opened.size() == 2 and _opened.back().kind == &"donation_question" and _opened.back().donation_amount == 5,
+		"Donor remains eligible after the prepared opening"
+	)
+
+
+func _test_prepared_rejection_and_retry() -> void:
+	var prepared := Content.get_prepared_topic()
+	_setup(8, true, 4000, 0.8, prepared)
+	_director.submit_donation_question(_donation(1), 19800)
+	_event(1, Event.Kind.COLLISION, 19900)
+	_reject = true
+	_director.tick(20000, false)
+	_check(
+		_requests.size() == 1 and _requests[0].template_id == prepared.id and _opened.is_empty(),
+		"Rejection while waiting offers only the reserved topic"
+	)
+	_reject = false
+	_director.tick(22000, false)
+	_check(
+		_opened.size() == 1 and _opened[0].template_id == prepared.id and _opened[0].window_msec == 4000,
+		"Delayed admission wins over the terminal reaction and preserves a fixed window"
+	)
+	_director.on_attempt_started(2)
+	_check(_director._pending_reaction == null, "Retry invalidates the pending terminal reaction")
+	_resolve(1, 26000, &"expired")
+	_director.tick(41999, true)
+	_check(_opened.size() == 1, "Gap starts at successful admission")
+	_director.tick(42000, true)
+	_check(
+		_opened.size() == 2 and _opened.back().kind == &"donation_question",
+		"The donor resumes at the exact delayed gap boundary after Snake retry"
+	)
+	_setup(8, true, 6000, 1.0, prepared)
+	_director.submit_donation_question(_donation(1), 19800)
+	_director.tick(20000, false)
+	_resolve(1, 26000, &"expired")
+	_director.tick(65000, true)
+	_check(
+		_opened.size() == 2 and _opened.back().kind == &"question" and _opened.back().template_id != prepared.id,
+		"Expired donor yields to an ordinary question"
+	)
+
+
+func _test_prepared_cap_and_lifecycle() -> void:
+	var prepared := Content.get_prepared_topic()
+	_setup(8, true, 6000, 1.0, prepared)
+	for index in range(8):
+		var now_msec := (index + 1) * 20000
+		if index > 0:
+			_director.submit_donation_question(_donation(index), now_msec)
+		_director.tick(now_msec, true)
+		_resolve(index + 1, now_msec + 1000)
+	_director.tick(180000, true)
+	_check(_opened.size() == 8, "Prepared opening consumes one of the eight slots")
+	var prepared_count := 0
+	for definition in _opened:
+		if definition.template_id == prepared.id:
+			prepared_count += 1
+	_check(prepared_count == 1, "Repeated resolutions cannot rearm the topic")
+	_setup(8, false, 6000, 1.0, prepared)
+	_director.tick(20000, false)
+	_check(_requests.is_empty(), "Disabled messages never offer a prepared topic")
+	_setup(8, true, 6000, 1.0, prepared)
+	_director.stop()
+	_director.tick(20000, false)
+	_check(_requests.is_empty(), "Stopped director cannot open a reserved question")
+	_director.reset()
+	_director.start(true)
+	_director.tick(20000, true)
+	_check(
+		_opened.size() == 1 and _opened[0].template_id != prepared.id,
+		"Ordinary restart has no reservation from the preceding stream"
+	)
 
 
 func _check(condition: bool, message: String) -> void:

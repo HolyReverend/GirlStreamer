@@ -8,6 +8,7 @@ Use [GameDesign/](GameDesign/) for concepts, mechanics, gameplay rules, and play
 
 - [ConceptDesign.md](GameDesign/ConceptDesign.md): game concept.
 - [Iteration02Scope.md](GameDesign/Iteration02Scope.md): agreed second-iteration scope: one complete stream with placeholder webcam, chat, choices, audience and donations.
+- [Iteration03Scope.md](GameDesign/Iteration03Scope.md) defines the unified preparation step, heroine condition, stream effects and next-day carryover.
 - [Mechanics/](GameDesign/Mechanics/): individual gameplay systems; select files by topic.
 
 Game design documentation is written in clear, simple Russian.
@@ -18,6 +19,7 @@ Use [Technical/](Technical/) for the roadmap, implementation stages, architectur
 
 - [Iteration01ImplementationPlan.md](Technical/Iteration01ImplementationPlan.md): first-iteration roadmap for Snake and keyboard quick-message responses, shared architecture, stage boundaries and focused checks.
 - [Iteration02ImplementationPlan.md](Technical/Iteration02ImplementationPlan.md): second-iteration staged implementation plan, ownership, proposed tuning and acceptance checks.
+- [Iteration03ImplementationPlan.md](Technical/Iteration03ImplementationPlan.md) covers the six stages from the day model to two-day playtesting.
 - [Iteration01And02Corrections.md](Technical/Iteration01And02Corrections.md): corrections to stream duration, interaction cadence, Snake acceleration and HUD placement; supersedes conflicting original stage requirements.
 - [Architecture.md](Technical/Architecture.md): current file ownership, scene/data connections, implemented systems, and focused entry points. Read before Godot work; update affected entries after it.
 

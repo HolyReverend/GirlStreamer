@@ -28,6 +28,7 @@ var _active_tick_seconds: float
 var _attempt_state: AttemptState = AttemptState.STOPPED
 var _accumulator_seconds := 0.0
 var _action_authorizer: Callable
+var _warning_range := 0
 
 @onready var _board: SnakeBoard = $Board
 
@@ -61,10 +62,13 @@ func start() -> void:
 func stop() -> void:
 	_attempt_state = AttemptState.STOPPED
 	_accumulator_seconds = 0.0
+	if is_instance_valid(_board):
+		_board.set_danger_hint(null)
 
 
 func clear_pending_turn() -> void:
 	_state.clear_pending_turn()
+	_refresh_danger_hint()
 
 
 func restart_attempt() -> bool:
@@ -88,6 +92,11 @@ func set_board_rect(rect: Rect2) -> void:
 
 func set_action_authorizer(authorizer: Callable) -> void:
 	_action_authorizer = authorizer
+
+
+func set_warning_range(cells: int) -> void:
+	_warning_range = clampi(cells, 0, SnakeState.MAX_WARNING_RANGE)
+	_refresh_danger_hint()
 
 
 func _is_action_authorized() -> bool:
@@ -136,6 +145,12 @@ func _publish_snapshot() -> void:
 	_board.set_snapshot(
 		_active_grid_size, _state.get_body_cells(), _state.has_food(), _state.get_food_cell()
 	)
+	_refresh_danger_hint()
+
+
+func _refresh_danger_hint() -> void:
+	if is_instance_valid(_board):
+		_board.set_danger_hint(_state.predict_danger(_warning_range) if is_playing() else null)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -145,6 +160,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.is_action_pressed(action):
 			if not _is_action_authorized():
 				return
-			_state.request_turn(MOVE_DIRECTIONS[action])
+			if _state.request_turn(MOVE_DIRECTIONS[action]):
+				_refresh_danger_hint()
 			get_viewport().set_input_as_handled()
 			return

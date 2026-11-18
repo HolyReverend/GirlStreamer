@@ -3,6 +3,7 @@ extends Node
 
 const Content = preload("res://prototype/stream/stream_content.gd")
 const Event = preload("res://prototype/stream/stream_event.gd")
+const StreamForecast = preload("res://prototype/day/stream_forecast.gd")
 const QUESTION_CONTEXT_TTL_MSEC := 15000
 const REACTION_WINDOW_MSEC := 3000
 const DEFAULT_QUESTION_WINDOW_MSEC := 6000
@@ -25,7 +26,9 @@ var _donation_ttl_msec := 0
 var _reaction_cooldown_msec := 0
 var _opening_limit := 0
 var _question_window_msec := DEFAULT_QUESTION_WINDOW_MSEC
+var _question_window_scale := 1.0
 
+var _prepared_topic: Content.QuestionTemplate
 var _pending_reaction: Event
 var _pending_donation: Content.ChoiceDefinition
 var _donation_created_msec := 0
@@ -71,7 +74,10 @@ func reset() -> void:
 	_latest_donation_id = 0
 
 
-func start(enabled: bool, question_window_msec: int = DEFAULT_QUESTION_WINDOW_MSEC) -> void:
+func start(
+	enabled: bool, question_window_msec: int = DEFAULT_QUESTION_WINDOW_MSEC, question_window_scale: float = 1.0,
+	prepared_topic: Content.QuestionTemplate = null
+) -> void:
 	if not has_valid_settings():
 		stop()
 		return
@@ -83,8 +89,10 @@ func start(enabled: bool, question_window_msec: int = DEFAULT_QUESTION_WINDOW_MS
 	_opening_limit = opening_cap
 	# A non-default Inspector value is a fixed window for this stream.
 	_question_window_msec = question_window_msec
+	_question_window_scale = question_window_scale
 	_question_templates = Content.get_questions()
 	_reaction_templates = Content.get_reactions()
+	_prepared_topic = prepared_topic.snapshot() if enabled and prepared_topic != null else null
 	_enabled = enabled
 
 
@@ -140,6 +148,15 @@ func on_choice_resolved(resolution: Content.ChoiceResolution) -> void:
 func tick(now_msec: int, snake_playing: bool) -> void:
 	_prune_pending(now_msec)
 	if not _can_admit() or _active_choice_id != 0 or now_msec < _next_open_msec or not _open_request.is_valid():
+		return
+	if _prepared_topic != null:
+		var template := _prepared_topic.snapshot()
+		var definition := Content.ChoiceDefinition.new(
+			0, template.id, &"question", template.prompt, "", template.options, _sample_question_window_msec(),
+			0, -1
+		)
+		if _try_open(definition, now_msec):
+			_prepared_topic = null
 		return
 	if snake_playing and _pending_donation != null:
 		var definition := _pending_donation.snapshot()
@@ -200,10 +217,16 @@ func _try_open_question(now_msec: int) -> void:
 
 
 func _sample_question_window_msec() -> int:
-	if _question_window_msec != DEFAULT_QUESTION_WINDOW_MSEC or not _viewer_count_provider.is_valid():
+	if _question_window_msec != DEFAULT_QUESTION_WINDOW_MSEC:
 		return _question_window_msec
-	var total_viewers: int = _viewer_count_provider.call()
-	return clampi(DEFAULT_QUESTION_WINDOW_MSEC - maxi(0, total_viewers - 30) * 10, 5000, 6000)
+	var base_msec := DEFAULT_QUESTION_WINDOW_MSEC
+	if _viewer_count_provider.is_valid():
+		var total_viewers: int = _viewer_count_provider.call()
+		base_msec = maxi(
+			StreamForecast.QUESTION_WINDOW_FLOOR_MSEC,
+			DEFAULT_QUESTION_WINDOW_MSEC - maxi(0, total_viewers - 30) * 10
+		)
+	return maxi(StreamForecast.QUESTION_WINDOW_FLOOR_MSEC, roundi(base_msec * _question_window_scale))
 
 
 func _try_open(definition: Content.ChoiceDefinition, now_msec: int) -> bool:
@@ -235,6 +258,7 @@ func _prune_pending(now_msec: int) -> void:
 
 
 func _clear_pending() -> void:
+	_prepared_topic = null
 	_pending_reaction = null
 	_pending_donation = null
 

@@ -20,7 +20,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var checks: Array[Callable] = [
-		_catalog, _malformed_catalog, _snapshot_and_keys, _exact_boundary, _reentrant_cancel,
+		_catalog, _prepared_topic_content, _malformed_catalog, _snapshot_and_keys, _exact_boundary, _reentrant_cancel,
 		_default_schedule, _context_freshness, _context_catalog, _exhausted_general_pool,
 		_finish_metrics_and_restart, _disabled_questions, _reply_priority, _caption_fit,
 		_pause_at_deadline, _resolution_while_waiting,
@@ -64,6 +64,38 @@ func _catalog() -> bool:
 			labels[option.label] = true
 			effects[option.effects] = true
 	return contexts == {&"general": 6, &"achievement": 3, &"loss": 3}
+
+
+func _prepared_topic_content() -> bool:
+	var ordinary := Content.get_questions()
+	var topic := Content.get_prepared_topic()
+	if not Content.validate_prepared_topic(topic, ordinary).is_empty():
+		return false
+	var definition := Content.ChoiceDefinition.new(
+		1, topic.id, &"question", topic.prompt, "Чат", topic.options, 5400, 0, -1
+	)
+	var source_hint := topic.options[0].hint
+	if (
+		not definition.is_valid() or not source_hint.contains("Ты это репетировала")
+		or topic.options[0].effects.x <= 0.0
+		or not topic.options[1].hint.is_empty() or not topic.options[2].hint.is_empty()
+	):
+		return false
+	var copied := definition.snapshot()
+	definition.options[0].hint = ""
+	if copied.options[0].hint != source_hint:
+		return false
+	topic = Content.get_prepared_topic()
+	topic.options[1].hint = source_hint
+	if Content.validate_prepared_topic(topic, ordinary).is_empty():
+		return false
+	topic = Content.get_prepared_topic()
+	topic.id = ordinary[0].id
+	if Content.validate_prepared_topic(topic, ordinary).is_empty():
+		return false
+	topic = Content.get_prepared_topic()
+	topic.options[0].id = ordinary[0].options[0].id
+	return not Content.validate_prepared_topic(topic, ordinary).is_empty()
 
 
 func _definition(id: int) -> Content.ChoiceDefinition:

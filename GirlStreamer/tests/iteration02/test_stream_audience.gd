@@ -14,7 +14,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var checks: Array[Callable] = [
-		_initial_reset_and_snapshot, _signed_fraction_and_step_order,
+		_initial_reset_and_snapshot, _opening_bonus_reset, _signed_fraction_and_step_order,
 		_clamps_recovery_and_peak, _style_usage_and_invalid_input, _scenarios,
 	]
 	for check in checks:
@@ -55,6 +55,27 @@ func _initial_reset_and_snapshot() -> bool:
 		and reset.carries == [0.0, 0.0, 0.0] and reset.step_count == 0 and reset.peak == 30
 		and reset.style_uses.is_empty() and model.apply_effect(1, Vector3.ZERO)
 	)
+
+
+func _opening_bonus_reset() -> bool:
+	var model := Audience.new()
+	model.apply_effect(1, Vector3(9, 3, 1), &"humor")
+	model.advance_second()
+	model.reset(1)
+	var opened := model.get_snapshot()
+	if (
+		opened.counts != Vector3i(11, 11, 11) or opened.total != 33 or opened.peak != 33
+		or opened.impressions != Vector3(50, 50, 50) or opened.carries != [0.0, 0.0, 0.0]
+		or opened.step_count != 0 or not opened.style_uses.is_empty()
+	):
+		return false
+	for second in range(20):
+		model.advance_second()
+	if model.get_snapshot().total != 36 or model.get_snapshot().peak != 36:
+		return false
+	model.reset()
+	var control := model.get_snapshot()
+	return control.counts == Vector3i(10, 10, 10) and control.peak == 30 and control.step_count == 0
 
 
 func _signed_fraction_and_step_order() -> bool:

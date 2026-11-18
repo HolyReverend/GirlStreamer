@@ -1,0 +1,336 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://prototype/day/preparation_screen.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Card"]
+bg_color = Color(0.134, 0.116, 0.185, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_left = 12
+corner_radius_bottom_right = 12
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 14.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="Normal"]
+bg_color = Color(0.26, 0.21, 0.34, 1)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(0.34, 0.27, 0.44, 1)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="Pressed"]
+bg_color = Color(0.42, 0.31, 0.57, 1)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="Disabled"]
+bg_color = Color(0.20, 0.17, 0.26, 1)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="Primary"]
+bg_color = Color(0.41, 0.26, 0.66, 1)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.83, 0.56, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="Theme" id="RoomTheme"]
+default_font_size = 16
+Button/colors/font_color = Color(0.98, 0.96, 1, 1)
+Button/colors/font_disabled_color = Color(0.72, 0.68, 0.79, 1)
+Button/styles/normal = SubResource("Normal")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Pressed")
+Button/styles/disabled = SubResource("Disabled")
+Button/styles/focus = SubResource("Focus")
+Label/colors/font_color = Color(0.91, 0.88, 0.96, 1)
+PanelContainer/styles/panel = SubResource("Card")
+
+[node name="PreparationScreen" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("RoomTheme")
+script = ExtResource("1")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.078, 0.064, 0.114, 1)
+
+[node name="Room" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_right = 38
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="Content" type="VBoxContainer" parent="Room"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Header" type="HBoxContainer" parent="Room/Content"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="DayHeading" type="Label" parent="Room/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "День 1"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 38
+
+[node name="Coins" type="Label" parent="Room/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Монеты: 0"
+theme_override_colors/font_color = Color(0.85, 0.80, 0.92, 1)
+
+[node name="ActionPoints" type="Label" parent="Room/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ОД: 6 из 6"
+theme_override_colors/font_color = Color(0.90, 0.78, 1, 1)
+theme_override_font_sizes/font_size = 21
+
+[node name="Body" type="HBoxContainer" parent="Room/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="Activities" type="VBoxContainer" parent="Room/Content/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Room/Content/Body/Activities"]
+layout_mode = 2
+text = "Подготовка к стриму"
+theme_override_font_sizes/font_size = 26
+
+[node name="ActivityScroll" type="ScrollContainer" parent="Room/Content/Body/Activities"]
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="ActivityList" type="VBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PublishPostRow" type="HBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PublishPost" type="Button" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/PublishPostRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 42)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Опубликовать анонс"
+
+[node name="PublishPostDetails" type="Label" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/PublishPostRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="PrepareTopicRow" type="HBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PrepareTopic" type="Button" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/PrepareTopicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 42)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Подготовить тему"
+
+[node name="PrepareTopicDetails" type="Label" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/PrepareTopicRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="TrainSnakeRow" type="HBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TrainSnake" type="Button" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/TrainSnakeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 42)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Потренироваться в Змейке"
+
+[node name="TrainSnakeDetails" type="Label" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/TrainSnakeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="WatchAnimeRow" type="HBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WatchAnime" type="Button" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/WatchAnimeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 42)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Посмотреть аниме"
+
+[node name="WatchAnimeDetails" type="Label" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/WatchAnimeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="TakeNapRow" type="HBoxContainer" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TakeNap" type="Button" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/TakeNapRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 42)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Вздремнуть"
+
+[node name="TakeNapDetails" type="Label" parent="Room/Content/Body/Activities/ActivityScroll/ActivityList/TakeNapRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Status" type="PanelContainer" parent="Room/Content/Body"]
+custom_minimum_size = Vector2(318, 0)
+layout_mode = 2
+
+[node name="Readout" type="VBoxContainer" parent="Room/Content/Body/Status"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StateTitle" type="Label" parent="Room/Content/Body/Status/Readout"]
+layout_mode = 2
+text = "Состояние"
+theme_override_font_sizes/font_size = 24
+
+[node name="Condition" type="Label" parent="Room/Content/Body/Status/Readout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+
+[node name="Divider" type="HSeparator" parent="Room/Content/Body/Status/Readout"]
+layout_mode = 2
+
+[node name="ForecastTitle" type="Label" parent="Room/Content/Body/Status/Readout"]
+layout_mode = 2
+text = "Вечерний эфир"
+theme_override_font_sizes/font_size = 24
+
+[node name="Forecast" type="Label" parent="Room/Content/Body/Status/Readout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+
+[node name="Response" type="PanelContainer" parent="Room/Content"]
+layout_mode = 2
+
+[node name="Feedback" type="Label" parent="Room/Content/Response"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+custom_minimum_size = Vector2(0, 42)
+autowrap_mode = 3
+vertical_alignment = 1
+
+[node name="Evening" type="HBoxContainer" parent="Room/Content"]
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 12
+
+[node name="StartStream" type="Button" parent="Room/Content/Evening"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(174, 48)
+layout_mode = 2
+theme_override_styles/normal = SubResource("Primary")
+text = "Начать стрим"
+
+[node name="SkipStream" type="Button" parent="Room/Content/Evening"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(174, 48)
+layout_mode = 2
+text = "Пропустить стрим"
